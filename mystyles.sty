@@ -1,9 +1,11 @@
 \usepackage[framemethod=TikZ]{mdframed}
-
 \definecolor{notebackground}{HTML}{EFF6FF}
 \definecolor{noteoutline}{HTML}{1E3A8A}
 \definecolor{notetext}{HTML}{1E3A8A}
 
 \newmdenv[backgroundcolor=notebackground,linecolor=noteoutline,linewidth=1pt,fontcolor=notetext]{note}
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{claim}[theorem]{Claim}
 
 \newcommand{\todo}[1]{\textcolor{red}{#1}}

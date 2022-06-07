@@ -78,6 +78,35 @@ Here, $p$ is chosen such that $\forall B \in \mathbb{B}.\ p \cdot B = 0$.
 In practice, we'll set $p = q$, which will work perfectly for the groups
 we use, which are all products of $\G$ or $\Zq$.
 
+\begin{claim}
+    Protocol \ref{prot:phiproof} is a valid sigma protocol.
+\end{claim}
+
+Completeness follows directly from the fact that $\varphi$ is a homomorphism.
+
+For the HVZK property, the simulator $\mathcal{S}(X, c)$ works by generating
+a random $s \xleftarrow{R} \mathbb{A}$, and then setting $K := \varphi(S) - c \cdot X$.
+
+Finally, we prove $2$-extractability. Given two verifying transcripts
+$(K, c, s)$ and $(K, c', s')$ sharing the first message, we extract
+a value $\hat{x}$ satisfying $\varphi(\hat{x}) = X$ as follows:
+
+$$
+\begin{aligned}
+\varphi(s) - c \cdot X &= K = \varphi(s') - c' \cdot X\\
+\varphi(s) - \varphi(s') &= c \cdot X - c' \cdot X\\
+\frac{1}{c - c'} \cdot \varphi(s - s') &= X\\
+\varphi \left(\frac{s - s'}{c - c'}\right) &= X
+\end{aligned}
+$$
+
+Thus, defining $\hat{x} := (s - s') / (c - c')$, we successfully extract
+a valid pre-image.
+
+We conclude that the protocol is a valid sigma protocol.
+
+$\blacksquare$
+
 Maurer's protocol can also work even in the case where the order of
 the groups are not known, but this makes the challenge generation
 a bit more complicated, and we don't need this functionality in
