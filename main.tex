@@ -119,10 +119,14 @@ this work.
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
 \\
-On receiving $(\texttt{prove}, \sid, X, x)$ from $P_i$:\\
+On input $(\texttt{prove}, \sid, x)$ from $P_i$:\\
 $\mathcal{F}$ checks that $\sid$ has not been used by $P_i$ before.\\
-$\mathcal{F}$ checks that $\varphi(x) \stackrel{?}{=} X$.\\
-$\mathcal{F}$ sends $(\texttt{proof}, \pid_i, \sid, X)$ to every party $P_j$.
+$\mathcal{F}$ generates a new token $\pi$, and sets $x_\pi \gets x$.\\
+$\mathcal{F}$ replies with $(\texttt{proof}, \pi)$.\\
+\\
+On input $(\texttt{verify}, X, \pi)$:\\
+$\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}{=} X)$.\\
+
 
 \end{afunctionality}
 
