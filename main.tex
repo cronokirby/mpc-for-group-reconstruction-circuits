@@ -128,6 +128,14 @@ $\mathcal{F}$ sends $(\texttt{proof}, \pid_i, \sid, X)$ to every party $P_j$.
 
 \subsection{Broadcast Functionalities}
 
+\begin{afunctionality}{fun:broadcast}{Authenticated Broadcast Functionality $\mathcal{C}$}
+A functionality $\mathcal{C}$ for parties $P_1, \ldots, P_n$.\\
+\\
+On receiving $(\texttt{broadcast-in}, \sid, m)$ from $P_i$:\\
+$\mathcal{C}$ checks that $\sid$ has not been used by $P_i$ before.\\
+$\mathcal{C}$ sends $(\texttt{broadcast-out}, \pid_i, \sid, m)$ to every party $P_j$.
+\end{afunctionality}
+
 \section{Group Reconstruction Circuits}
 
 \subsection{Formal Definition}
