@@ -53,18 +53,35 @@ here.
 
 Given a homomorphism $\varphi : \mathbb{A} \to \mathbb{B}$, and a public value
 $X \in \mathbb{B}$, the prover wants to demonstrate knowledge of a private
-value $x \in \mathbb{A}$ such that $\varphi(x) = X$.
+value $x \in \mathbb{A}$ such that $\varphi(x) = X$. The prover
+does this by means of Protocol \ref{prot:phiproof}:
 
-\begin{afigure}{fig:phiproof}{$\varphi$-Proof}
+\begin{aprotocol}{prot:phiproof}{$\varphi$-Proof}
 \[
 \begin{aligned}
-    &x + 2\\
-    &x + 2\\
+    &\textbf{Prover}&&\textbf{Verifier}\\
+    &\text{knows } x \in \mathbb{A}&&\text{public } X \in \mathbb{B}\\
+    \\
+    &k \xleftarrow{R} \mathbb{A}&\\
+    &K \gets \varphi(k)&\\
+    &&\quad\overset{K}{\longrightarrow}\quad\\
+    &&&c \xleftarrow{R} \mathbb{Z}/(p)\\
+    &&\quad\overset{c}{\longleftarrow}\quad\\
+    &s \gets k + c \cdot x\\
+    &&\quad\overset{s}{\longrightarrow}\quad\\
+    &&& \varphi(s) \overset{?}{=} K + c \cdot X\\
 \end{aligned}
 \]
-\end{afigure}
+\end{aprotocol}
 
-In Figure \ref{fig:phiproof}
+Here, $p$ is chosen such that $\forall B \in \mathbb{B}.\ p \cdot B = 0$.
+In practice, we'll set $p = q$, which will work perfectly for the groups
+we use, which are all products of $\G$ or $\Zq$.
+
+Maurer's protocol can also work even in the case where the order of
+the groups are not known, but this makes the challenge generation
+a bit more complicated, and we don't need this functionality in
+this work.
 
 \subsection{UC Security and the Hybrid Model}
 
