@@ -122,13 +122,14 @@ this work.
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
 \\
-On input $(\texttt{prove}, \sid, x)$ from $P_i$:\\
+On input $(\texttt{prove}, \sid, X, x)$ from $P_i$:\\
 $\mathcal{F}$ checks that $\sid$ has not been used by $P_i$ before.\\
-$\mathcal{F}$ generates a new token $\pi$, and sets $x_\pi \gets x$.\\
+$\mathcal{F}$ checks that $\varphi(x) \stackrel{?}{=} X$.\\
+$\mathcal{F}$ generates a new token $\pi$, and sets $X_\pi \gets X$.\\
 $\mathcal{F}$ replies with $(\texttt{proof}, \pi)$.\\
 \\
 On input $(\texttt{verify}, X, \pi)$:\\
-$\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}{=} X)$.\\
+$\mathcal{F}$ replies with $(\texttt{verify-result}, X_\pi \stackrel{?}{=} X)$.\\
 
 
 \end{afunctionality}
@@ -178,6 +179,41 @@ $\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \te
 \end{afunctionality}
 
 \subsection{Protocol}
+
+$$
+\psi_r(\textbf{x}, \textbf{y}, \boldsymbol{\alpha}, \textbf{k}, \boldsymbol{\beta})
+:= (\varphi_r(\textbf{x}, \textbf{y}, \textbf{j}), \bx \cdot G, \text{Commit}(\textbf{y}, \boldsymbol{\alpha}), \text{Commit}(\textbf{k}, \boldsymbol{\beta}))
+$$
+
+\begin{aprotocol}{prot:mpc}{MPC protocol for $\Phi, \textbf{X}^j, \textbf{Y}^j$}
+
+Each party $P_j$ has inputs $\textbf{x}^j$ and $\textbf{y}^j$, committed to
+by $\textbf{X}^j$ and $\textbf{Y}^j$.
+They also have decommitments $\boldsymbol{\alpha}^j$ for $\textbf{Y}^j$.
+Each party $P_j$ also has a vector $\textbf{k}^j$, which honest parties will
+have generated randomly.\\
+\\
+\textbf{Round 0}\\
+Each party $P_j$ generates a random vector $\boldsymbol{\beta}^j$, and creates
+a commitment to $\textbf{k}^j$ with:
+$$
+\textbf{K}^j := \text{Commit}(\textbf{k}^j, \boldsymbol{\beta}^j)
+$$
+$P_j$ sends $(\texttt{broadcast-in}, \texttt{sid}, \textbf{K}^j)$ to
+the broadcast functionality $\mathcal{C}$.\\
+\\
+\textbf{Round $r$}\\
+Each party $P_j$ computes $\bV^j_r := \varphi_r(\bV_1, \ldots, \bV_{r - 1})(\bx^j, \by^j, \bk^j)$.\\
+Each party $P_j$ sends $(\texttt{prove}, \texttt{sid}, (\bV^j_r, \bX^j, \bY^j, \bK^j), (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
+to $\mathcal{F}(\texttt{ZK}, \psi_r)$, receiving $\pi^j_r$ in return.\\
+Each party $P_j$ sends $(\bV^j_r, \pi^j_r)$ to every other party.\\
+\\
+After receiving $(\bV^i_r, \pi^i_r)$  from all other parties, $P_j$ checks,
+for each $i$, that the proof is valid, by sending $(\texttt{verify}, (\bV^i_r, \bX^i, \bY^i, \bK^i), \pi^i_r)$ to
+$\mathcal{F}(\texttt{ZK}, \psi_r)$, and aborting if the functionality returns $0$.\\
+Each party $P_j$ then stores each $\bV^i_r$ as part of its output.
+\end{aprotocol}
+
 
 \subsection{Security Analysis}
 
