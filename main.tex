@@ -122,14 +122,13 @@ this work.
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
 \\
-On input $(\texttt{prove}, \sid, X, x)$ from $P_i$:\\
+On input $(\texttt{prove}, \sid, x)$ from $P_i$:\\
 $\mathcal{F}$ checks that $\sid$ has not been used by $P_i$ before.\\
-$\mathcal{F}$ checks that $\varphi(x) \stackrel{?}{=} X$.\\
-$\mathcal{F}$ generates a new token $\pi$, and sets $X_\pi \gets X$.\\
+$\mathcal{F}$ generates a new token $\pi$, and sets $x_\pi \gets x$.\\
 $\mathcal{F}$ replies with $(\texttt{proof}, \pi)$.\\
 \\
 On input $(\texttt{verify}, X, \pi)$:\\
-$\mathcal{F}$ replies with $(\texttt{verify-result}, X_\pi \stackrel{?}{=} X)$.\\
+$\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}{=} X)$.\\
 
 
 \end{afunctionality}
@@ -201,10 +200,12 @@ $$
 $$
 $P_j$ sends $(\texttt{broadcast-in}, \texttt{sid}, \textbf{K}^j)$ to
 the broadcast functionality $\mathcal{C}$.\\
+$P_j$ waits to receive $(\texttt{broadcast-out}, \texttt{sid}, \textbf{K}^i)$
+for each other party $i$.\\
 \\
 \textbf{Round $r$}\\
 Each party $P_j$ computes $\bV^j_r := \varphi_r(\bV_1, \ldots, \bV_{r - 1})(\bx^j, \by^j, \bk^j)$.\\
-Each party $P_j$ sends $(\texttt{prove}, \texttt{sid}, (\bV^j_r, \bX^j, \bY^j, \bK^j), (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
+Each party $P_j$ sends $(\texttt{prove}, \texttt{sid}, (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
 to $\mathcal{F}(\texttt{ZK}, \psi_r)$, receiving $\pi^j_r$ in return.\\
 Each party $P_j$ sends $(\bV^j_r, \pi^j_r)$ to every other party.\\
 \\
@@ -214,6 +215,131 @@ $\mathcal{F}(\texttt{ZK}, \psi_r)$, and aborting if the functionality returns $0
 Each party $P_j$ then stores each $\bV^i_r$ as part of its output.
 \end{aprotocol}
 
+\begin{claim}
+Provided that the discrete logarithm is hard in $\mathbb{G}$, Protocol \ref{prot:mpc} securely implements Functionality \ref{fun:mpc},
+in the hybrid model of universally composable security,
+given a zk functionality $\mathcal{F}(\text{ZK}, \varphi)$ (for arbitrary $\varphi$),
+a broadcast functionality $\mathcal{C}$, as well as a common reference string
+${(G, H) \in \mathbb{G}^2}$.
+\end{claim}
+\textbf{Proof:}\\
+We prove this by constructing a simulator $\calS$ which uses
+the ideal functionality $\mathcal{F}(\texttt{GRC})$ to perfectly
+simulate an execution of the hybrid protocol against an adversary
+$\mathcal{A}$.
+
+We also work in the common reference string model, where the simulator
+$\mathcal{S}$ chooses the bases $(G, H)$ for the Pedersen commitments.
+
+We use this simulator $\calS$ to construct an adversary against
+the discrete logarithm game.
+
+Let $\calM \subseteq \calP$ be the set of malicious parties,
+and $\calH \subseteq \calP$ be the set of honest parties. Naturally,
+we have $\calH \cup \calM = \calP$ and $\calH \cap \calM = \emptyset$.
+
+As an adversary against the discrete logarithm game,
+$\calS$ receives $(G, H)$ as an instance 
+of the discrete logarithm problem.
+
+The simulator then proceeds as follows:\\
+$\calS$ starts by setting $(G, H)$ as the common reference string.
+
+\textbf{Round 0}:\\
+For each $j \in \calH$, $\calS$ samples $\bK^j \xleftarrow{R} \mathbb{G}$.\\
+For each $j \in \calM$,
+$\calS$ waits to receive $(\texttt{broadcast-in}, \texttt{sid}, \bK^j)$.\\
+$\calS$ then sends $(\texttt{broadcast-out}, \texttt{pid}_j, \texttt{sid}, \bK^j)$,
+to all parties, for every $j \in \calP$, emulating $\mathcal{C}$.
+
+\textbf{Interim}:\\
+$\calS$ waits to receive $(\texttt{prove}, \texttt{sid}, (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
+for each malicious ${j \in \calM}$,
+playing the role of $\mathcal{F}(\texttt{ZK}, \psi_1)$.\\
+$\calS$ checks, for each $j$, that:
+$$
+\begin{aligned}
+\bX^j &\stackrel{?}{=} \bx^j \cdot G\\
+\bY^j &\stackrel{?}{=} \by^j \cdot G + \balpha^j \cdot H\\
+\bK^j &\stackrel{?}{=} \bk^j \cdot G + \bbeta^j \cdot H
+\end{aligned}
+$$
+otherwise, $\calS$ sets $\texttt{bad-values}^j_1 \gets 1$.\\
+$\calS$ records the values $\bx^j, \by^j, \balpha^j, \bk^j, \balpha^j$, for $j \in \calM$.\\
+
+Now, in the real execution against $\mathcal{F}(\texttt{GRC})$,
+with real honest parties $P_i$, for
+each $j \in \calM$, the parties $\calS$ controls, $\calS$ sends
+$(\texttt{input}, \texttt{sid}, \bx^j, \by^j, \balpha^j, \bk^j)$ to $\mathcal{F}(\texttt{GRC})$.\\
+$\calS$ receives $(\texttt{output}, \texttt{sid}, \bV^1_1, \ldots, \bV^n_d)$ in return,
+and records these values.
+
+\textbf{Round $r$}:\\
+For each round $r \in [d]$, $\calS$ proceeds as follows:\\
+$\calS$ generates a new $\pi^i_r$ for each $i \in \calH$, and sends
+$(\bV^i_r, \pi^i_r)$ to every malicious $P_j$, with $j \in \calM$.
+
+Unless $r = 1$, $\calS$ waits to receive 
+$(\texttt{prove}, \texttt{sid}, \hat{\bx}^j, \hat{\by}^j, \hat{\balpha}^j, \hat{\bk}^j, \hat{\bbeta}^j)$
+from each malicious $P_j$, for $j \in \calM$, playing the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$.\\
+$\mathcal{S}$ then checks, for each $j$, that:
+$$
+\begin{aligned}
+\bX^j &\stackrel{?}{=} \hat{\bx}^j \cdot G\\
+\bY^j &\stackrel{?}{=} \hat{\by}^j \cdot G + \hat{\balpha}^j \cdot H\\
+\bK^j &\stackrel{?}{=} \hat{\bk}^j \cdot G + \hat{\bbeta}^j \cdot H
+\end{aligned}
+$$
+and sets $\texttt{bad-values}^j_r \gets 1$ otherwise.\\
+The first check implies that $\hat{\bx^j} = \bx^j$. If it holds that
+$\hat{\by}^j \neq \by^j$ or $\hat{\bk}^j \neq \bk^j$, then $\calS$ has
+found a value $h$ such that $h \cdot G = H$, as shown in \todo{reference previous section},
+and $\calS$ aborts, returning $h$.
+
+(Including when $r = 1$) $\calS$ generates a new $\pi^j_r$, and returns $(\texttt{proof}, \pi^j_r)$,
+playing the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$.
+
+Concurrently, $\calS$ plays the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$,
+responding to $(\texttt{verify}, (\hat{\bV}^i_r, \hat{\bX}^i, \hat{\bY}^i, \hat{\bK}^i), \pi)$
+queries. $\calS$ checks that there exists some $j \in \mathcal{P}$ such that
+$\pi^j_r = \pi$. $\calS$ then returns:
+$$
+\hat{\bV}^i_r \stackrel{?}{=} \bV^i_r \land
+\hat{\bX}^i \stackrel{?}{=} \bX^i \land
+\hat{\bY}^i \stackrel{?}{=} \bY^i \land
+\hat{\bK}^i \stackrel{?}{=} \bK^i \land
+\texttt{bad-values}^j_r \neq 1
+$$
+
+$\calS$ then waits to receive $(\hat{\bV}^j, \hat{\pi}^j_r)$ for
+every malicious party $P_j$, with ${j \in \mathcal{M}}$.\\
+$\calS$ then checks if the query $(\texttt{verify}, (\hat{\bV^j_r}, \bX^j, \bY^j, \bK^j), \hat{\pi}^j_r)$
+would yield $1$, according to the logic in the section above.
+(If $\hat{\pi}^j_r$ doesn't match anything, the check is considered to fail).
+If this check fails, then $\calS$ simulates every honest $P_i$ aborting, with $i \in \calH$,
+to abort, as if they'd seen an invalid proof themselves.
+
+This concludes the simulation.
+
+If $\calS$ aborts with a value $h$, then they've successfully
+solved an instance of the discrete logarithm problem. Under our
+assumption that this problem is hard, this happens with negligeable
+probability.
+
+We argue that if $\calS$ does not abort in this way, then the simulation
+is perfect. For the first round, because pedersen commitments
+are perfectly hiding, sampling a random $\bK^j$ has an identical
+distribution as an honest party generating a pedersen commitment.
+For the rest of the protocol, all of our checks are equivalent
+to those made by honest parties. This is because the
+$\bV^i_j$ values are necessarily computed correctly, and use
+the inputs provided by the parties the adversary $\mathcal{A}$ controls.
+
+Because our simulator $\calS$ is perfect, and doesn't
+rewind the adversary $\mathcal{A}$, we conclude that our protocol
+satisfies universally composable security, in the hybrid model.
+
+$\square$
 
 \subsection{Security Analysis}
 
