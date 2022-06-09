@@ -36,10 +36,12 @@ $$
 \varphi(P_1, \ldots, P_m)(x_1, \ldots, x_n)
 $$
 to denote the application of $\varphi$ to an element $(x_1, \ldots, x_n)$
-of the product group.
-Such an element is sometimes treated as a vector $\textbf{x}$, in which case
-we write $\varphi(P_1, \ldots, P_m)(\textbf{x})$.
-We also often leave the public values $P_i$ implicit.
+of the product group. The public values $P_i$ are often left implicit.
+
+We often write products $(x_1, \ldots, x_n)$ as a single vector
+$\bx \in \mathbb{A}^n$. Operations between these vectors
+are done element-wise, so we write $\bx + \by$ for ${(x_1 + y_1, \ldots, x_n + y_n)}$,
+as well as $\bx \cdot G$ for $(x_1 \cdot G, \ldots, x_n \cdot G)$.
 
 \subsection{Pedersen Commitments}
 
