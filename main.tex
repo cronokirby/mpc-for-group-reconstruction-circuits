@@ -21,7 +21,7 @@
 Throughout this paper, we let $\G$ denote a group of prime order $q$,
 with generators $G$ and $H$. Let $\Fq$ denote the scalar field associated
 with this group, and let $\Zq$ denote the additive group of elements
-in this field.
+in this field. We also define $[n] := [1, \ldots, n]$.
 
 We make heavy use of group homomorphisms throughout this paper.
 We let
@@ -47,44 +47,71 @@ as well as $\bx \cdot G$ for $(x_1 \cdot G, \ldots, x_n \cdot G)$.
 
 A key component of our scheme are Pedersen commitments \cite{pedersen_non-interactive_1992}.
 In their basic form, they allow one to commit to a value in $x \in \Zq$. This
-is done by sampling a random $r \xleftarrow{R} \Zq$, and forming the commitment:
+is done by sampling a random $\alpha \xleftarrow{R} \Zq$, and forming the commitment:
 $$
-\text{Com}(x, r) := x \cdot G + r \cdot H
+\text{Com}(x, \alpha) := x \cdot G + \alpha \cdot H
 $$
 where $H$ is a generator of $\mathbb{G}$, independent from $G$.
 
-This scheme is \emph{perfectly hiding}, because $r \cdot H$ acts like
+This scheme is \emph{perfectly hiding}, because $\alpha \cdot H$ acts like
 a random element of $\mathbb{G}$, and completely masks $x \cdot G$.
 
 On the other hand, this scheme is only \emph{computationally} binding. This
 is because the discrete logarithm $H$ with respect to $G$ must be kept hidden.
 If the discrete logarithm of $H$ is known, then it becomes possible to
-\emph{equivocate}, by finding two inputs $(x, r)$ and $(x', r')$ with
-equal commitments, i.e. $\text{Com}(x, r) = \text{Com}(x', r')$.
+\emph{equivocate}, by finding two different inputs $(x, \alpha)$ and $(x', \alpha')$ with
+equal commitments, i.e. $\text{Com}(x, \alpha) = \text{Com}(x', \alpha')$.
 
 In fact, we can more precisely characterize this property: knowing
 the discrete logarithm of $H$ is \emph{necessary} in order to be able
 to equivocate.
 
 \begin{claim}
-    Given two inputs $(x, r)$ and $(x', r')$ such that ${\text{Com}(x, r) = \text{Com}(x', r')}$,
-    it's possible to efficiently compute a value $h$ such that $h \cdot G = H$.
+    \label{claim:ped_dlog}
+    Given two inputs $(x, \alpha) \neq (x', \alpha')$ such that ${\text{Com}(x, \alpha) = \text{Com}(x', \alpha')}$,
+    it's possible to efficiently compute the discrete logarithm of $H$.
 \end{claim}
 
 The proof is just a matter of algebra:
 
 $$
 \begin{aligned}
-x \cdot G + r \cdot H &= x' \cdot G + r' \cdot H\\
-(x - x') \cdot G &= (r' - r) \cdot H\\
-\frac{(x - x')}{(r' - r)} \cdot G &= H\\
+x \cdot G + \alpha \cdot H &= x' \cdot G + \alpha' \cdot H\\
+(x - x') \cdot G &= (\alpha' - \alpha) \cdot H\\
+\frac{(x - x')}{(\alpha' - \alpha)} \cdot G &= H\\
 \end{aligned}
 $$
 
-Thus $(x - x') / (r' - r)$ is our discrete logarithm.
+Thus $(x - x') / (\alpha' - \alpha)$ is our discrete logarithm.
 
-$\square$
+$\blacksquare$
 
+\subsubsection{Vector Pedersen Commitments}
+
+It's useful to generalize this scheme to the case of a vector of scalars
+${\textbf{x} \in \Zq^n}$. The randomness becomes a vector of the same
+size, sampled as ${\balpha \xleftarrow{R} \Zq^n}$. We then define
+an analogous commitment scheme by doing scalar multiplication element-wise:
+$$
+\text{Com}(\bx, \balpha) := \bx \cdot G + \balpha \cdot H
+$$
+This generalization is naturally also perfectly hiding, and satisfies
+an analogous property with regards to equivocation:
+
+\begin{claim}
+    Given two inputs $(\bx, \balpha) \neq (\bx', \balpha')$ such that
+    $\text{Com}(\bx, \balpha) = \text{Com}(\bx', \balpha')$, it's possible
+    to efficiently compute the discrete logarithm of $H$.
+\end{claim}
+
+Since the two inputs are different, there must exist an index $i$
+such that $\bx_i \neq \bx_i'$ or $\balpha_i \neq \balpha_i'$.
+From here we apply Claim \ref{claim:ped_dlog} with $(\bx_i, \balpha_i)$ and
+$(\bx_i', \balpha'_i)$.
+
+$\blacksquare$
+
+\subsubsection{On the Trusted Setup}
 
 \subsection{Sigma Protocols}
 
@@ -382,7 +409,7 @@ Because our simulator $\calS$ is perfect, and doesn't
 rewind the adversary $\mathcal{A}$, we conclude that our protocol
 satisfies universally composable security, in the hybrid model.
 
-$\square$
+$\blacksquare$
 
 \subsection{Security Analysis}
 
