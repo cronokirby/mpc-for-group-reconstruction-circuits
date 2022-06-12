@@ -132,6 +132,13 @@ such as public newspapers, lotteries
 \cite{baigneres_trap_2015}, or Cryptographic protocols
 designed to provide such a service \cite{fischer_public_2011}.
 
+Now, in practice while we can avoid a trusted setup with these methods,
+for our security analysis we do actually make use of this setup.
+Essentially, we prove that the security of our protocol reduces
+to the hardness of the discrete logarithm problem in $\mathbb{G}$,
+and to do this we need to be able to use an instance of the problem
+as a setup for the participants in our simulation.
+
 \subsection{Sigma Protocols}
 
 \subsection{Maurer's \texorpdfstring{$\varphi$}{varphi}-Proof}
