@@ -113,6 +113,25 @@ $\blacksquare$
 
 \subsubsection{On the Trusted Setup}
 
+In theory, Pedersen commitments require a trusted setup, to generate
+the group elements $G, H \in \mathbb{G}$. In practice, we argue that
+this trusted setup isn't a concern. This is the generator $G$
+is usually part of the specification for the group being used,
+and because there exist
+efficient methods to hash into elliptic curves \cite{icart_how_2009}.
+This reduces the problem of generating $H$ to that of finding a credibly
+``unbiased'' choice of seed to hash. This can be done in many ways.
+
+One way would be to hash a canonical representation of $G$ as bytes in order
+to produce $H$. Presumably, the generator $G$ was not chosen in such
+a way as to produce an $H$ with a known discrete logarithm, with
+that specific method of hashing into the group.
+
+Another method would be to use a public source of randomness,
+such as public newspapers, lotteries
+\cite{baigneres_trap_2015}, or Cryptographic protocols
+designed to provide such a service \cite{fischer_public_2011}.
+
 \subsection{Sigma Protocols}
 
 \subsection{Maurer's \texorpdfstring{$\varphi$}{varphi}-Proof}
