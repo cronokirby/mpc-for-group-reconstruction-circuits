@@ -298,6 +298,59 @@ order to efficiently demonstrate the correctness of our computations.
 
 \subsection{Formal Definition}
 
+Formally, a group reconstruction circuit (GRC) is a special kind of
+directed acyclic graph (DAG), similar to an arithmetic circuit.
+This graph is \emph{typed}, in the sense that each node is associated
+with some group $\mathbb{A}$, which represent the kinds of values
+that node is supposed to have.
+This graph features the following nodes:
+
+\begin{itemize}
+    \item An input node, with type $\Zq$.
+    \item A random input node, type $\Zq$.
+    \item A reconstruction node, which has another node as input, and inherits the type of that node.
+    \item A $\varphi$ node, which can have several inputs, and which represents
+    a homomorphism
+    $\varphi(P_1, \ldots, P_l) : \mathbb{G}_1 \times \ldots \times \mathbb{G}_m \to \mathbb{H}$.
+    For each of the public parameters $P_i$, there should be an input connected to a reconstruction node.
+    For each of the inputs in $\mathbb{G}_i$, there should be an input connected to a node of that type.
+    \item An output node, of some type $\mathbb{A}$.
+\end{itemize}
+
+As an example, let's consider the functionality for Schnorr signatures.
+
+\begin{afigure}{fig:schnorr}{Schnorr Signature GRC}
+\begin{tikzpicture}[y=-1cm]
+    \draw (0,0) rectangle (1,1) node[pos=0.5, scale=2.0] {$x$};
+    \draw (1.5,1.5) rectangle (2.5,2.5) node[pos=0.5, scale=2.0] {$\$$};
+    \draw (3.5,1.5) rectangle (4.5,2.5) node[pos=0.5, scale=2.0] {$\cdot G$};
+    \draw (5.0,1.5) rectangle (6.0,2.5) node[pos=0.5, scale=2.0] {$\circlearrowleft$};
+    \draw (5.0,0.0) rectangle (6.0,1) node[pos=0.5, scale=2.0] {$\varphi$};
+    \draw (7.0,3.0) rectangle (8.0,4.0) node[pos=0.5, scale=2.0] {$+$};
+    \draw (8.5,3.0) rectangle (9.5,4.0) node[pos=0.5, scale=2.0] {$\circlearrowleft$};
+    \draw (11,3.0) rectangle (12,4.0) node[pos=0.5, scale=2.0] {$s$};
+    \draw (11,1.5) rectangle (12,2.5) node[pos=0.5, scale=2.0] {$K$};
+    \draw [->] (1, 0.5) -- (5.0, 0.5);
+    \draw [->] (2.5, 2.0) -- (3.5, 2.0);
+    \draw [->] (4.5, 2.0) -- (5.0, 2.0);
+    \draw [->] (5.5, 1.5) -- (5.5, 1.0);
+    \draw [->] (6.0, 2.0) -- (11, 2.0);
+    \draw [->] (2.0, 2.5) -- (2.0, 3.5) -- (7.0, 3.5);
+    \draw [->] (6.0, 0.5) -- (7.5, 0.5) -- (7.5, 3.0);
+    \draw [->] (8.0, 3.5) -- (8.5, 3.5);
+    \draw [->] (9.5, 3.5) -- (11, 3.5);
+\end{tikzpicture}
+\end{afigure}
+
+Figure \ref{fig:schnorr} presents the circuit for Schnorr signatures,
+with $\circlearrowleft$ denoting reconstruction nodes,
+$\$$ denoting random input nodes, and $\varphi$ denoting
+the parameterized homomorphism:
+
+$$
+\varphi(K)(x) := H(K, m) \cdot x
+$$
+
 \subsection{Normalized Form}
 
 \section{MPC Protocol for GRCs}
