@@ -231,6 +231,11 @@ $\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}
 
 \subsection{Broadcast Functionalities}
 
+The second ideal functionality we need is a \emph{broadcast functionality}.
+The purpose of this functionality is to allow a party to send a message
+to all other parties, while guaranteeing that the party doesn't cheat
+by sending different messages.
+
 \begin{afunctionality}{fun:broadcast}{Authenticated Broadcast Functionality $\mathcal{C}$}
 A functionality $\mathcal{C}$ for parties $P_1, \ldots, P_n$.\\
 \\
@@ -238,6 +243,21 @@ On receiving $(\texttt{broadcast-in}, \sid, m)$ from $P_i$:\\
 $\mathcal{C}$ checks that $\sid$ has not been used by $P_i$ before.\\
 $\mathcal{C}$ sends $(\texttt{broadcast-out}, \pid_i, \sid, m)$ to every party $P_j$.
 \end{afunctionality}
+
+In fact, our functionality only needs to be usable a single time, so it's
+in reality a \emph{one-time} broadcast functionality, which might be simpler
+to implement.
+
+The key difference between this broadcast functionality and simply sending
+a message to all other parties is that the functionality prevents malicious
+participants from sending different messages to different parties.
+We use this later in the protocol to broadcast commitments, and in this
+situation it's important that all parties agree on what the values of
+these commitments are.
+
+We note that this functionality can be securely implemented
+in the UC framework using the ``echo-broadcast'' protocol from
+\cite{goldwasser_secure_2005}.
 
 \section{Group Reconstruction Circuits}
 
