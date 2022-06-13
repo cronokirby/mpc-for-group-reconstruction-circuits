@@ -255,9 +255,27 @@ We use this later in the protocol to broadcast commitments, and in this
 situation it's important that all parties agree on what the values of
 these commitments are.
 
-We note that this functionality can be securely implemented
+This functionality can be securely implemented
 in the UC framework using the ``echo-broadcast'' protocol from
-\cite{goldwasser_secure_2005}.
+\cite{goldwasser_secure_2005}, which we recapitulate here:
+
+\begin{aprotocol}{prot:echo}{Echo-Broadcast Protocol}
+Each party $P_i$ has a broadcast input $m_i$.\\
+\\
+Each $P_i$ sends $(\texttt{sid}, m_i)$ to all other parties.\\
+Upon receiving $(\texttt{sid}, \hat{m}^j)$ from $P_j$, $P_i$ checks that
+it hasn't already received a message from $P_j$ for this $\texttt{sid}$,
+and then sends $(\texttt{rebroadcast}, \texttt{sid}, j, \hat{m}^j)$ to all other parties.\\
+Upon receiving $(\texttt{rebroadcast}, \texttt{sid}, j, \hat{m}_i^j)$ from all
+parties, $P_i$ checks that $\hat{m}_1^j = \hat{m}_2^j = \ldots = \hat{m}^j_n$,
+and then uses $\hat{m}^j_1$ as the message sent by $P_j$ for this session.
+\end{aprotocol}
+
+This protocol UC securely implements Functionality \ref{fun:broadcast}.
+
+We note that instead of each party forwarding $\hat{m}^j$, it's also possible
+to send $H(\hat{m}^j)$, where $H$ is a collision-resistant hash function.
+This might be advantageous for long messages.
 
 \section{Group Reconstruction Circuits}
 
