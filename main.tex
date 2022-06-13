@@ -279,6 +279,23 @@ This might be advantageous for long messages.
 
 \section{Group Reconstruction Circuits}
 
+If we look at the various functionalities we saw in the introduction,
+they all share quite a few commonalities. They first convert
+a threshold sharing of the input into a linear sharing of the input.
+These secret shared inputs can be added together, using $[x]$ and $[y]$
+to form $[x + y]$, or used to multiply a group element, forming
+$[xA]$. These operations can be done locally.
+A secret shared value $[x]$ can be reconstructed, to have each party learn $x$.
+
+In essence, \emph{group reconstruction circuits} are a vast generalization
+of this kind of functionality. The core of the idea is that the operations
+done inside of these functionalities are in fact all group homomorphisms,
+with respect to all of their inputs. Because of these, the functionality
+can be efficiently computed by each party locally, with the reconstruction
+steps done by having each party reveal their share of the secret.
+Furthermore, in the malicious setting, we can use $\varphi$-proofs in
+order to efficiently demonstrate the correctness of our computations.
+
 \subsection{Formal Definition}
 
 \subsection{Normalized Form}
