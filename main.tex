@@ -317,6 +317,8 @@ This graph features the following nodes:
     \item An output node, of some type $\mathbb{A}$.
 \end{itemize}
 
+\todo{Describe semantics in the isolated case}.
+
 As an example, let's consider the functionality for Schnorr signatures.
 
 \begin{afigure}{fig:schnorr}{Schnorr Signature GRC}
@@ -351,11 +353,21 @@ $$
 \varphi(K)(x) := H(K, m) \cdot x
 $$
 
+\todo{maybe add some more stuff here?}
+
 \subsection{Normalized Form}
+
+\todo{Stuff: Move randomness up, use single input vector, use single homomorphism per layer, depend explicitly on all previous parameters}.
+
+\todo{Then describe the evaluation semantics in this normalized form}.
 
 \section{MPC Protocol for GRCs}
 
+\todo{Talk about the committed model, the various kinds of commitments, the at least one honest model}.
+
 \subsection{Ideal Functionality}
+
+\todo{Intro here.}
 
 \begin{afunctionality}{fun:mpc}{GRC functionality $\mathcal{F}(\texttt{GRC}, \Phi, \textbf{X}^j, \textbf{Y}^j)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
@@ -380,6 +392,8 @@ $$
 $$\\
 $\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \textbf{V}^n_d)$ to every party $P_j$.
 \end{afunctionality}
+
+\todo{Why leaking intermediate values is allowed.}
 
 \subsection{Protocol}
 
@@ -418,6 +432,8 @@ for each $i$, that the proof is valid, by sending $(\texttt{verify}, (\bV^i_r, \
 $\mathcal{F}(\texttt{ZK}, \psi_r)$, and aborting if the functionality returns $0$.\\
 Each party $P_j$ then stores each $\bV^i_r$ as part of its output.
 \end{aprotocol}
+
+\subsection{Security Analysis}
 
 \begin{claim}
 Provided that the discrete logarithm is hard in $\mathbb{G}$, Protocol \ref{prot:mpc} securely implements Functionality \ref{fun:mpc},
@@ -545,15 +561,23 @@ satisfies universally composable security, in the hybrid model.
 
 $\blacksquare$
 
-\subsection{Security Analysis}
-
 \subsection{Practical Considerations}
 
 \section{Applications}
 
+\todo{One example application for DKG, Schnorr, Threshold Encryption, Polynomial Commitments}
+
 \section{Limitations and Further Work}
 
+\todo{Aggregating proofs}
+
+\todo{Exploiting circuit structure for lighter proofs}
+
+\todo{Threshold Interpretations}
+
 \section{Conclusion}
+
+\todo{Summarize stuff}
 
 \bibliographystyle{alpha}
 \small \bibliography{bib}
