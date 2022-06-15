@@ -322,10 +322,20 @@ This graph features the following nodes:
     $\varphi(P_1, \ldots, P_l) : \mathbb{G}_1 \times \ldots \times \mathbb{G}_m \to \mathbb{H}$.
     For each of the public parameters $P_i$, there should be an input connected to a reconstruction node.
     For each of the inputs in $\mathbb{G}_i$, there should be an input connected to a node of that type.
-    \item An output node, of some type $\mathbb{A}$.
+    \item An output node, which has a single non-output node as input, inheriting its type.
 \end{itemize}
 
-\todo{Describe semantics in the isolated case}.
+This circuit can be given semantics in the form of a semi-honest MPC protocol.
+For each of the input nodes with value $x$, the parties have a linear
+secret sharing $\shared{x}$. For random nodes, the parties sample
+a sharing $\shared{k}$ by locally generating a random share $k_i \xleftarrow{R} \Zq$.
+For reconstruction nodes, the parties go from a secret sharing $\shared{y}$
+to a public value $y$ by having each party reveal their share $y_i$.
+For $\varphi$ nodes, the parties use the fact that
+$\shared{\varphi(x^1, \ldots, x^m)} = \varphi(\shared{x^1}, \ldots, \shared{x}^m)$,
+by locally computing their share of the result as $\varphi(x^1_i, \ldots, x^m_i)$.
+Finally, for output nodes, they use their local share of a value, if that
+value is secret, or the public value, if it has been reconstructed. \todo{phrasing?}
 
 As an example, let's consider the functionality for Schnorr signatures.
 
@@ -361,7 +371,15 @@ $$
 \varphi(K)(x) := H(K, m) \cdot x
 $$
 
-\todo{maybe add some more stuff here?}
+Using our semantics for circuits, we get a semi-honest protocol for
+threshold Schnorr signatures. The quorum turns their threshold
+secret sharing of the secret key $x$ into a linear secret sharing $\shared{x}$.
+They then generate a shared nonce $\shared{k}$ by each sampling
+$k_i \xleftarrow{R} \Zq$. They calculate a sharing $\shared{K := k \cdot G}$
+by each computing $K_i := k_i \cdot G$. They then reveal these $K_i$ to
+learn $K$. They can then compute $s_i := \varphi(K)(x_i)$ locally,
+creating a sharing $\shared{s}$, whose shares they then reveal,
+to learn $s$. They then use $(K, s)$ as their signature.
 
 \subsection{Normalized Form}
 
