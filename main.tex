@@ -519,8 +519,13 @@ then $\bk := \sum_i \bk^i$ will also be random.
 
 \subsection{Ideal Functionality}
 \label{sec:idealfunc}
-
-\todo{Intro here.}
+In this section, we describe an ideal functionality for our protocol,
+as Functionality \ref{fun:mpc}.
+This functionality is parameterized by the circuit $\Phi$,
+as well as the input commitments $\bX^i$ and $\bY^i$, for each party
+$i \in [n]$.
+The functionality also uses a common reference string $G, H \in \mathbb{G}$,
+for Pedersen commitments.
 
 \begin{afunctionality}{fun:mpc}{GRC functionality $\mathcal{F}(\texttt{GRC}, \Phi, \textbf{X}^i, \textbf{Y}^i)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
@@ -537,7 +542,7 @@ $$
 $\mathcal{F}$ computes, for each round $r \in [d]$:
 $$
 \begin{aligned}
-    \textbf{V}^j_{r} &:= \varphi_{r}(\textbf{V}_{1}, \ldots, \textbf{V}_{r - 1})(
+    \textbf{V}^i_{r} &:= \varphi_{r}(\textbf{V}_{1}, \ldots, \textbf{V}_{r - 1})(
         \textbf{x}^i, \textbf{y}^i, \textbf{k}^i
     )\\
     \textbf{V}_r &:= \sum_j \textbf{V}^i_r
@@ -546,7 +551,21 @@ $$\\
 $\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \textbf{V}^n_d)$ to every party $P_i$.
 \end{afunctionality}
 
-\todo{Why leaking intermediate values is allowed.}
+This functionality checks that the inputs each party provides match
+the public commitments, and then computes the output of the circuit
+in a straightforward manner.
+One slight difference is that instead of simply learning $\bV_r$ for
+every round $r$, each party learns $\bV^i_r$ for every party $i$.
+Naturally, we have $\bV_r = \sum_i \bV^i_r$, so this information
+can be derived by each party.
+The reason we allow the parties to also learn the individual shares
+being revealed is that our eventual protocol will also reveal this
+information, so we need to model the leakage in our functionality as well.
+Furthermore, this matches the semantics of group reconstruction circuits,
+where parties learn the individual shares of the group element they're
+reconstructing.
+For practical functionalities like Schnorr signatures or threshold encryption,
+learning these intermediate values is not a concern either.
 
 \subsection{Protocol}
 
