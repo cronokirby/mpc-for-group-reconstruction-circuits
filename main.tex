@@ -870,7 +870,26 @@ such as~\cite{barak_protocol_2004}, in parallel with the first round.
 This improves the round complexity of the concrete protocol as
 compared to sequential composition.
 
-\subsection{Concrete Complexity}
+\subsection{Complexity}
+
+The round complexity of our protocol is near-optimal, with
+only one additional round to provide commitments to random inputs,
+which can be omitted if the circuit doesn't use them.
+
+We also argue that the concrete complexity of our protocol
+compares favorably with more specialized protocols.
+As noted before, the basic approach of locally computing
+the homomorphisms matches the basic strategy of specialized protocols.
+The overhead in our case comes from the additional $\varphi$-proofs
+we need to include, as well as computing additional commitments
+for the random inputs.
+Thankfully, these proofs are quite efficient.
+The cost of each proof is dominated by that of computing
+$\varphi$, along with 5 scalar multiplications, to prove that
+the right inputs were used.
+While more expensive than more specialized protocols,
+this is nonetheless a manageable amount of overhead for
+a generic protocol.
 
 \section{Applications}
 \label{sec:applications}
