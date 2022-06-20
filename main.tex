@@ -153,6 +153,7 @@ and to do this we need to be able to use an instance of the problem
 as a setup for the participants in our simulation.
 
 \subsection{Maurer's \texorpdfstring{$\varphi$}{varphi}-Proof}
+\label{sec:maurer}
 
 In \cite{maurer_unifying_2009}, Maurer generalized Schnorr's sigma 
 protocol for knowledge of the discrete logarithm \cite{schnorr_efficient_1990} to a much larger class
@@ -524,7 +525,7 @@ as Functionality \ref{fun:mpc}.
 This functionality is parameterized by the circuit $\Phi$,
 as well as the input commitments $\bX^i$ and $\bY^i$, for each party
 $i \in [n]$.
-The functionality also uses a common reference string $G, H \in \mathbb{G}$,
+The functionality also uses a common reference string $(G, H) \in \mathbb{G}^2$,
 for Pedersen commitments.
 
 \begin{afunctionality}{fun:mpc}{GRC functionality $\mathcal{F}(\texttt{GRC}, \Phi, \textbf{X}^i, \textbf{Y}^i)$}
@@ -569,10 +570,45 @@ learning these intermediate values is not a concern either.
 
 \subsection{Protocol}
 
+In this section, we provide a protocol implementing Functionality
+\ref{fun:mpc}.
+
+The basic idea is that for each round $r$, the parties locally
+compute $\bV^i_r := \varphi_r(\bx^i, \by^i, \bk^i)$, and then
+send these values to other parties, along with a proof that
+the value was computed correctly, and that the inputs used correspond
+to the public commitments.
+
+For the random input $\bk^i$, we need to guarantee that the same
+input vector is used throughout the protocol.
+We do this by creating a Pedersen commitment $\bK^i$ to the random value,
+and having an initial round where each party broadcasts this commitment
+to the other parties.
+To prevent a party from sending different commitments, we
+use Functionality \ref{fun:broadcast} to guarantee that the same
+commitment is sent to all parties.
+
+We can easily prove that each step was computed correctly, and with the right
+inputs, by using the following homomorphism:
 $$
 \psi_r(\textbf{x}, \textbf{y}, \boldsymbol{\alpha}, \textbf{k}, \boldsymbol{\beta})
-:= (\varphi_r(\bx, \by, \bk), \bx \cdot G, \text{Commit}(\textbf{y}, \boldsymbol{\alpha}), \text{Commit}(\textbf{k}, \boldsymbol{\beta}))
+:= (\varphi_r(\bx, \by, \bk),\ \bx \cdot G,\ \by \cdot G + \balpha \cdot H,\
+\bk \cdot G + \bbeta \cdot H) 
 $$
+This homomorphism uses the same inputs to compute $\varphi_r$,
+but also reconstructs all of the commitments to the inputs.
+The $\varphi$-proofs seen in Section \ref{sec:maurer}
+provide an efficient sigma protocol to verify
+that a value $\bV^i_r$ was computed using $\varphi_r$ on the correct
+inputs.
+We then use Functionality \ref{fun:zk} to turn these sigma protocols
+into ZK proof of knowledge functionalities.
+
+Protocol \ref{prot:mpc} describes all of this more formally.
+Like the ideal functionality, the protocol is parameterized by
+the circuit $\Phi$, the public commitments $\bX^i, \bY^i$, and makes
+use of a common reference string $(G, H) \in mathbb{G}^2$, for Pedersen
+commitments.
 
 \begin{aprotocol}{prot:mpc}{MPC protocol for $\Phi, \textbf{X}^i, \textbf{Y}^i$}
 
@@ -586,7 +622,7 @@ have generated randomly.\\
 Each party $P_i$ generates a random vector $\boldsymbol{\beta}^i$, and creates
 a commitment to $\textbf{k}^i$ with:
 $$
-\textbf{K}^i := \text{Commit}(\textbf{k}^i, \boldsymbol{\beta}^i)
+\textbf{K}^i := \bk^i \cdot G + \bbeta^i \cdot H
 $$
 $P_i$ sends $(\texttt{broadcast-in}, \texttt{sid}, \textbf{K}^i)$ to
 the broadcast functionality $\mathcal{C}$.\\
@@ -602,8 +638,13 @@ Each party $P_i$ sends $(\bV^i_r, \pi^i_r)$ to every other party.\\
 After receiving $(\bV^j_r, \pi^j_r)$  from all other parties, $P_i$ checks,
 for each $j$, that the proof is valid, by sending $(\texttt{verify}, (\bV^j_r, \bX^j, \bY^j, \bK^j), \pi^j_r)$ to
 $\mathcal{F}(\texttt{ZK}, \psi_r)$, and aborting if the functionality returns $0$.\\
-Each party $P_i$ then stores each $\bV^j_r$ as part of its output.
+Each party $P_i$ then stores each $\bV^j_r$ as part of its output,
+and computes $\bV_r := \sum_j \bV^j_r$.
 \end{aprotocol}
+
+As we mentioned in the previous section, the parties learn
+the intermediate values $\bV^i_r$ as a consequence of the protocol's
+execution.
 
 \subsection{Security Analysis}
 
