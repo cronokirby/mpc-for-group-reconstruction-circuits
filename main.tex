@@ -894,7 +894,57 @@ a generic protocol.
 \section{Applications}
 \label{sec:applications}
 
+In this section, we describe several applications of our protocol,
+by providing concrete group reconstruction circuits
+for various functionalities.
+We also compare the complexity of our generic protocol,
+instantiated on these circuits, with specialized
+protocols computing the same functionality.
+
 \todo{One example application for DKG, Schnorr, Threshold Encryption, Polynomial Commitments}
+
+\subsection{Distributed Key Generation}
+
+\subsection{Threshold Schnorr Signatures}
+
+We've described the Schnorr signature functionality as a GRC before,
+but not yet in normalized form. In this form, our input consists
+of the private signature key $x$, as well as the nonce $k$.
+We then have two homomorphisms:
+$$
+\begin{aligned}
+    \varphi_1(x, k) &:= k \cdot G\\
+    \varphi_2(K)(x, k) &:= k + H(K, m) \cdot x
+\end{aligned}
+$$
+
+We can then instantiate our protocol with this circuit to get a
+threshold signature scheme, assuming that some other distributed
+key generation scheme is used.
+Given a threshold sharing of the private key $x$,
+we assume that a quorum of parties can generate a linear sharing
+of $x$ as $x_1 + \ldots + x_n$, along with public key shares $X^i := x_i \cdot G$.
+This assumption matches the standard polynomial schemes used
+for threshold secret sharing, where Lagrange interpolation is used
+to derive linear shares.
+Using these linear shares, the parties then run our protocol
+to compute a signature.
+
+The round complexity of this signing protocol matches
+that 3 round scheme of Lindell \cite{lindell_simple_2022}.
+The only additional security assumption we make is that hardness
+of the discrete logarithm in $\mathbb{G}$, which makes our protocol
+relatively conservative, as Lindell's scheme purports to be.
+The concrete complexity of our protocol is a bit higher, because of
+the extra proofs we need to compute, and our use of Pedersen commitments.
+
+Our protocol compares disfavorably against 2 round signing protocols
+such as FROST \cite{komlo_frost_2020}, or MuSig2 \cite{nick_musig2_2021},
+which also have better concrete complexity.
+
+\subsection{Threshold Encryption}
+
+\subsection{Polynomial Commitments and Openings}
 
 \section{Limitations and Further Work}
 
