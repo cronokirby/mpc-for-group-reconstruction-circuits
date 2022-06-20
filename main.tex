@@ -112,6 +112,7 @@ This generalization is naturally also perfectly hiding, and satisfies
 an analogous property with regards to equivocation:
 
 \begin{claim}
+    \label{claim:ped_vec_dlog}
     Given two inputs $(\bx, \balpha) \neq (\bx', \balpha')$ such that
     $\text{Com}(\bx, \balpha) = \text{Com}(\bx', \balpha')$, it's possible
     to efficiently compute the discrete logarithm of $H$.
@@ -607,8 +608,12 @@ into ZK proof of knowledge functionalities.
 Protocol \ref{prot:mpc} describes all of this more formally.
 Like the ideal functionality, the protocol is parameterized by
 the circuit $\Phi$, the public commitments $\bX^i, \bY^i$, and makes
-use of a common reference string $(G, H) \in mathbb{G}^2$, for Pedersen
+use of a common reference string $(G, H) \in \mathbb{G}^2$, for Pedersen
 commitments.
+The protocol takes $d + 1$ rounds, with $d$ the depth of the circuit.
+As we mentioned in the previous section, the parties learn
+the intermediate values $\bV^i_r$ as a consequence of the protocol's
+execution.
 
 \begin{aprotocol}{prot:mpc}{MPC protocol for $\Phi, \textbf{X}^i, \textbf{Y}^i$}
 
@@ -642,11 +647,18 @@ Each party $P_i$ then stores each $\bV^j_r$ as part of its output,
 and computes $\bV_r := \sum_j \bV^j_r$.
 \end{aprotocol}
 
-As we mentioned in the previous section, the parties learn
-the intermediate values $\bV^i_r$ as a consequence of the protocol's
-execution.
-
 \subsection{Security Analysis}
+
+In this section, we prove that Protocol \ref{prot:mpc} implements
+Functionality \ref{fun:mpc} with UC security, even against an arbitrary
+number of malicious parties.
+More specifically, we work with the SUC model of security~\cite{canetti_simpler_2015}.
+We also work in the hybrid model, using Functionalities
+\ref{fun:zk} and \ref{fun:broadcast} for ZK proofs of knowledge,
+and authenticated broadcast, respectively.
+We also need a common reference string $(G, H) \in \mathbb{G}^2$, for
+Pedersen commitments.
+In our proof, the simulator provides this string.
 
 \begin{claim}
 Provided that the discrete logarithm is hard in $\mathbb{G}$, Protocol \ref{prot:mpc} securely implements Functionality \ref{fun:mpc},
@@ -655,6 +667,30 @@ given a zk functionality $\mathcal{F}(\text{ZK}, \varphi)$ (for arbitrary $\varp
 a broadcast functionality $\mathcal{C}$, as well as a common reference string
 ${(G, H) \in \mathbb{G}^2}$.
 \end{claim}
+\textbf{Proof Idea:}\\
+The basic idea is that we use an instance of the discrete logarithm problem
+as our common reference string.
+This makes any break of the binding property of Pedersen commitments
+yield a solution to the discrete logarithm.
+Otherwise, we can perfectly simulate an execution of the protocol
+using the ideal functionality, without rewinding
+the adversary, which lets us conclude that our protocol is UC secure,
+using the result in \cite{kushilevitz_information-theoretically_2009}.
+
+One technical detail is that we need inputs from every party
+to give to the ideal functionality.
+Because of this, our simulator first runs the simulated protocol
+until the adversary provides the input for their parties in the first
+ZK proof.
+We can then use these values for the parties the simulator controls
+in the ideal functionality.
+
+The output of this functionality gives us all of the values we need
+in the rest of the simulation, except for the commitments $\bK^i$
+to the random inputs of the honest parties.
+For these, we use the fact that Pedersen commitments are perfectly
+hiding, and simply generate them at random.
+
 \textbf{Proof:}\\
 We prove this by constructing a simulator $\calS$ which uses
 the ideal functionality $\mathcal{F}(\texttt{GRC})$ to perfectly
@@ -726,7 +762,7 @@ $$
 and sets $\texttt{bad-values}^i_r \gets 1$ otherwise.\\
 The first check implies that $\hat{\bx^i} = \bx^i$. If it holds that
 $\hat{\by}^i \neq \by^i$ or $\hat{\bk}^i \neq \bk^i$, then $\calS$ has
-found a value $h$ such that $h \cdot G = H$, as shown in \todo{reference previous section},
+found a value $h$ such that $h \cdot G = H$, as per Claim \ref{claim:ped_vec_dlog},
 and $\calS$ aborts, returning $h$.
 
 (Including when $r = 1$) $\calS$ generates a new $\pi^i_r$, and returns $(\texttt{proof}, \pi^i_r)$,
@@ -769,12 +805,35 @@ $\bV^j_i$ values are necessarily computed correctly, and use
 the inputs provided by the parties the adversary $\mathcal{A}$ controls.
 
 Because our simulator $\calS$ is perfect, and doesn't
-rewind the adversary $\mathcal{A}$, we conclude that our protocol
+rewind the adversary $\mathcal{A}$, we conclude,
+using~\cite{kushilevitz_information-theoretically_2009},
+that our protocol
 satisfies universally composable security, in the hybrid model.
 
 $\blacksquare$
 
+\subsubsection{Identifiable Abort}
+
+We note that our protocol can be considered to have identifiable
+aborts, provided that the implementation of the broadcast functionality
+also has this property.
+After round $0$, if a party causes an abort by providing an invalid
+proof, then that abort can be detected, since there will be
+a signed message containing this invalid proof, which can be used
+as evidence of cheating.
+
 \subsection{Practical Considerations}
+
+In this section we describe a few additional details which might
+be useful for concrete implementations of the protocol.
+
+\subsubsection{Sparse Proofs}
+
+\subsubsection{Parallel Echos}
+
+\subsubsection{Parallel $\texttt{sid}$}
+
+\subsection{Concrete Complexity}
 
 \section{Applications}
 \label{sec:applications}
