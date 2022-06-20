@@ -829,9 +829,46 @@ be useful for concrete implementations of the protocol.
 
 \subsubsection{Sparse Proofs}
 
+For simplicity, we described each homomorphism $\varphi_i$ in the circuit
+as taking in the entire input vector $\bx$.
+These homomorphisms may be \emph{sparse}, in the sense
+that they only use a few of the elements in the input vector.
+It should be noted that in this case, the $\varphi$-proofs can
+be done as if only these select elements existed, which gives
+a slightly smaller and faster proof.
+
+\subsubsection{Removing Random Commitments}
+
+Some functionalities may not use any random input $\bk$.
+In this case, the first round can be omitted, since there's
+no need to commit to an empty vector.
+This actually improves the complexity of threshold encryption,
+as we'll see in Section \todo{cite}.
+
 \subsubsection{Parallel Echos}
 
+In the description of our protocol, we use one round for broadcasting
+the commitments to the random inputs, using our broadcast functionality.
+If we naively replace this functionality with the
+echo-broadcast in Protocol \ref{prot:echo},
+we increase the round complexity, since that protocol requires 2 rounds.
+However, the second round of the echo-broadcast protocol is only
+need to check the consistency of the broadcasted input; the parties
+already know the input after the first round.
+Because of this, we can run the re-broadcast round \emph{in parallel}
+with the rest of the protocol, and thus incur no additional
+cost to round complexity. 
+
 \subsubsection{Parallel $\texttt{sid}$}
+
+While there are different ways of instantiating the ZK proofs
+of knowledge for Functionality \ref{fun:zk}, some of them
+heavily rely on the use of a unique session identifier $\texttt{sid}$.
+Because this particular identifier isn't needed in the first round,
+we can run a session identifier agreement protocol,
+such as~\cite{barak_protocol_2004}, in parallel with the first round.
+This improves the round complexity of the concrete protocol as
+compared to sequential composition.
 
 \subsection{Concrete Complexity}
 
