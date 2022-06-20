@@ -29,6 +29,7 @@
 \todo{Organization of the rest of this paper...}
 
 \section{Background}
+\label{sec:background}
 
 Throughout this paper, we let $\G$ denote a group of prime order $q$,
 with generators $G$ and $H$. Let $\Fq$ denote the scalar field associated
@@ -325,6 +326,12 @@ This graph features the following nodes:
     \item An output node, which has a single non-output node as input, inheriting its type.
 \end{itemize}
 
+Each $\varphi$ node has a \emph{depth} associated with it, equal
+to the largest number of reconstruction nodes on a path from an input
+node to the $\varphi$ node, plus $1$.
+We can define the depth of a circuit, by taking the largest depth
+among its $\varphi$ nodes.
+
 This circuit can be given semantics in the form of a semi-honest MPC protocol.
 For each of the input nodes with value $x$, the parties have a linear
 secret sharing $\shared{x}$. For random nodes, the parties sample
@@ -371,6 +378,9 @@ $$
 \varphi(K)(x) := H(K, m) \cdot x
 $$
 
+Both the $\varphi$ and $+$ nodes have a depth of $2$, and thus so
+does the circuit.
+
 Using our semantics for circuits, we get a semi-honest protocol for
 threshold Schnorr signatures. The quorum turns their threshold
 secret sharing of the secret key $x$ into a linear secret sharing $\shared{x}$.
@@ -383,15 +393,103 @@ to learn $s$. They then use $(K, s)$ as their signature.
 
 \subsection{Normalized Form}
 
-\todo{Stuff: Move randomness up, use single input vector, use single homomorphism per layer, depend explicitly on all previous parameters}.
+While the formal definition of GRCs above is complete, and closely
+matches the description of various functionalities, it's not
+particularly convenient to design a protocol for.
+We can vastly simplify the description of a GRC through the use
+of a \emph{normalized form}, which is a much more compact representation
+of this circuit.
+This normalized form is also directly amenable to an implementation
+as an MPC protocol.
+This form is derived from a series of simple transformations on
+a GRC.
 
-\todo{Then describe the evaluation semantics in this normalized form}.
+First, note that the random input nodes of the GRC don't depend on
+any other node. Because of this, we can move all of these input nodes
+to the start of the circuit, which has the semantics of generating
+all the randomness in the circuit at the start of the execution.
+
+Second, instead of having several input nodes $x^1, \ldots, x^m$,
+all elements of $\Zq$, we
+instead have a single input \emph{vector} $\bx \in \Zq^m$.
+This vector can also be considered as a single element of the product
+group, with addition defined pointwise, as in Section \ref{sec:background}.
+In fact, we can also include random elements as part of the input.
+The idea is that honest parties will generate this part of the input
+randomly for each execution.
+We treat this issue in more detail in Section \ref{sec:idealfunc}.
+
+Third, we can make each $\varphi$ node depend on the entire
+input vector $\bx$.
+In practice, this dependency can be sparse, in that $\varphi$
+will only make use of a small number of elements in the input.
+Nonetheless, $\varphi$ is still a homomorphism with respect
+to the entire input.
+This is because a projection $\pi : \Zq^m \to \Zq^l$, which selects
+a subset of elements from an input vector, is a group homomorphism.
+Any homomorphism using only a subset of elements can be composed with $\pi$
+to make a homomorphism taking in the entire vector.
+
+Fourth, we can coalesce the homomorphisms together, creating one
+homomorphism for each ``layer'' of the circuit.
+We do this by first organizing the $\varphi$ nodes into layers,
+based on their depth.
+Each node with the same depth goes into the same layer.
+We then coalesce all of the homomorphisms in this layer into
+a single homomorphism $\varphi$.
+We can do this because the duplication map $a \mapsto (a, a)$
+and the projection map $(a, \_) \mapsto a$ are both homomorphisms.
+We can sort all of the homomorphisms topologically, and then compose
+them sequentially, duplicating the input and projecting as necessary.
+
+We can also remove reconstruction nodes.
+Because each layer only has a single homomorphism, we can consider
+the output of this homomorphism to neccessarily be reconstructed.
+We then make each homomorphism parameterized by all of the reconstructed
+outputs from each previous layer.
+
+Finally, we can remove output nodes.
+By considering the output of every layer to be part of the output,
+we include all of the output nodes connected to reconstruction nodes.
+For the other outputs, they can be locally computed using the reconstructed
+outputs, as well as the shares of the input vector, so it's not necessary
+to include them in the circuit.
+
+Combining all of these gives us the formal description of normalized form
+GRCs in Figure \ref{fig:grc}.
+
+\begin{afigure}{fig:grc}{GRCs in normalized form}
+A group reconstruction circuit (GRC) in normalized form consists of:
+\begin{itemize}
+    \item An input length $m$, and a depth $d$.
+    \item Groups $\mathbb{B}_1, \ldots, \mathbb{B}_d$.
+    \item Homomorphisms $\varphi_1, \ldots, \varphi_d$. Each $\varphi_i$
+    is a homomorphism $\Zq^m \to \mathbb{B}_i$, and is parameterized
+    by values $\bV_1, \ldots, \bV_{i - 1}$ with $\bV_i \in \mathbb{B}_i$.
+\end{itemize}
+\end{afigure}
+
+We can also give circuits in this form semantics, in the form
+of a semi-honest MPC protocol.
+The parties have a linear secret sharing $\shared{\bx}$ of
+the input vector, some entries of which having been generated randomly
+for this execution.
+Then, for each layer $r \in 1, \ldots, d$, the parties locally
+compute $\bV_r^i := \varphi_r(\bV_1, \ldots, \bV_{r - 1})$,
+and then reveal these shares, allowing each party to compute
+$\bV_r := \sum_i \bV_r^i$.
+The values $\bV_1, \ldots, \bV_d$ make up the output of the protocol.
+
+In Section \ref{sec:applications}, we provide examples of GRCs
+in normalized form for several functionalities, including Schnorr
+signatures.
 
 \section{MPC Protocol for GRCs}
 
 \todo{Talk about the committed model, the various kinds of commitments, the at least one honest model}.
 
 \subsection{Ideal Functionality}
+\label{sec:idealfunc}
 
 \todo{Intro here.}
 
@@ -590,6 +688,7 @@ $\blacksquare$
 \subsection{Practical Considerations}
 
 \section{Applications}
+\label{sec:applications}
 
 \todo{One example application for DKG, Schnorr, Threshold Encryption, Polynomial Commitments}
 
