@@ -493,28 +493,28 @@ signatures.
 
 \todo{Intro here.}
 
-\begin{afunctionality}{fun:mpc}{GRC functionality $\mathcal{F}(\texttt{GRC}, \Phi, \textbf{X}^j, \textbf{Y}^j)$}
+\begin{afunctionality}{fun:mpc}{GRC functionality $\mathcal{F}(\texttt{GRC}, \Phi, \textbf{X}^i, \textbf{Y}^i)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
 \\
 After receiving
-$(\texttt{input}, \texttt{sid}, \textbf{x}^j, \textbf{y}^j, \boldsymbol{\alpha}^j, \textbf{k}^j)$ from every party $P_j$:\\
-$\mathcal{F}$ checks, for every $j \in [n]$, that:
+$(\texttt{input}, \texttt{sid}, \textbf{x}^i, \textbf{y}^i, \boldsymbol{\alpha}^i, \textbf{k}^i)$ from every party $P_i$:\\
+$\mathcal{F}$ checks, for every $i \in [n]$, that:
 $$
 \begin{aligned}
-    \textbf{X}^j &\stackrel{?}{=} \textbf{x}^j \cdot G\\
-    \textbf{Y}^j &\stackrel{?}{=} \textbf{y}^j \cdot G + \boldsymbol{\alpha}^j \cdot H\\
+    \textbf{X}^i &\stackrel{?}{=} \textbf{x}^i \cdot G\\
+    \textbf{Y}^i &\stackrel{?}{=} \textbf{y}^i \cdot G + \boldsymbol{\alpha}^i \cdot H\\
 \end{aligned}
 $$
 $\mathcal{F}$ computes, for each round $r \in [d]$:
 $$
 \begin{aligned}
     \textbf{V}^j_{r} &:= \varphi_{r}(\textbf{V}_{1}, \ldots, \textbf{V}_{r - 1})(
-        \textbf{x}^j, \textbf{y}^j, \textbf{k}^j
+        \textbf{x}^i, \textbf{y}^i, \textbf{k}^i
     )\\
-    \textbf{V}_r &:= \sum_j \textbf{V}^j_r
+    \textbf{V}_r &:= \sum_j \textbf{V}^i_r
 \end{aligned}
 $$\\
-$\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \textbf{V}^n_d)$ to every party $P_j$.
+$\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \textbf{V}^n_d)$ to every party $P_i$.
 \end{afunctionality}
 
 \todo{Why leaking intermediate values is allowed.}
@@ -523,38 +523,38 @@ $\mathcal{F}$ sends $(\texttt{output}, \texttt{sid}, \textbf{V}^1_1, \ldots, \te
 
 $$
 \psi_r(\textbf{x}, \textbf{y}, \boldsymbol{\alpha}, \textbf{k}, \boldsymbol{\beta})
-:= (\varphi_r(\textbf{x}, \textbf{y}, \textbf{j}), \bx \cdot G, \text{Commit}(\textbf{y}, \boldsymbol{\alpha}), \text{Commit}(\textbf{k}, \boldsymbol{\beta}))
+:= (\varphi_r(\bx, \by, \bk), \bx \cdot G, \text{Commit}(\textbf{y}, \boldsymbol{\alpha}), \text{Commit}(\textbf{k}, \boldsymbol{\beta}))
 $$
 
-\begin{aprotocol}{prot:mpc}{MPC protocol for $\Phi, \textbf{X}^j, \textbf{Y}^j$}
+\begin{aprotocol}{prot:mpc}{MPC protocol for $\Phi, \textbf{X}^i, \textbf{Y}^i$}
 
-Each party $P_j$ has inputs $\textbf{x}^j$ and $\textbf{y}^j$, committed to
-by $\textbf{X}^j$ and $\textbf{Y}^j$.
-They also have decommitments $\boldsymbol{\alpha}^j$ for $\textbf{Y}^j$.
-Each party $P_j$ also has a vector $\textbf{k}^j$, which honest parties will
+Each party $P_i$ has inputs $\textbf{x}^i$ and $\textbf{y}^i$, committed to
+by $\textbf{X}^i$ and $\textbf{Y}^i$.
+They also have decommitments $\boldsymbol{\alpha}^i$ for $\textbf{Y}^i$.
+Each party $P_i$ also has a vector $\textbf{k}^i$, which honest parties will
 have generated randomly.\\
 \\
 \textbf{Round 0}\\
-Each party $P_j$ generates a random vector $\boldsymbol{\beta}^j$, and creates
-a commitment to $\textbf{k}^j$ with:
+Each party $P_i$ generates a random vector $\boldsymbol{\beta}^i$, and creates
+a commitment to $\textbf{k}^i$ with:
 $$
-\textbf{K}^j := \text{Commit}(\textbf{k}^j, \boldsymbol{\beta}^j)
+\textbf{K}^i := \text{Commit}(\textbf{k}^i, \boldsymbol{\beta}^i)
 $$
-$P_j$ sends $(\texttt{broadcast-in}, \texttt{sid}, \textbf{K}^j)$ to
+$P_i$ sends $(\texttt{broadcast-in}, \texttt{sid}, \textbf{K}^i)$ to
 the broadcast functionality $\mathcal{C}$.\\
-$P_j$ waits to receive $(\texttt{broadcast-out}, \texttt{sid}, \textbf{K}^i)$
-for each other party $i$.\\
+$P_i$ waits to receive $(\texttt{broadcast-out}, \texttt{sid}, \textbf{K}^j)$
+for each other party $j$.\\
 \\
 \textbf{Round $r$}\\
-Each party $P_j$ computes $\bV^j_r := \varphi_r(\bV_1, \ldots, \bV_{r - 1})(\bx^j, \by^j, \bk^j)$.\\
-Each party $P_j$ sends $(\texttt{prove}, \texttt{sid}, (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
-to $\mathcal{F}(\texttt{ZK}, \psi_r)$, receiving $\pi^j_r$ in return.\\
-Each party $P_j$ sends $(\bV^j_r, \pi^j_r)$ to every other party.\\
+Each party $P_i$ computes $\bV^i_r := \varphi_r(\bV_1, \ldots, \bV_{r - 1})(\bx^i, \by^i, \bk^i)$.\\
+Each party $P_i$ sends $(\texttt{prove}, \texttt{sid}, (\bx^i, \by^i, \balpha^i, \bk^i, \bbeta^i))$
+to $\mathcal{F}(\texttt{ZK}, \psi_r)$, receiving $\pi^i_r$ in return.\\
+Each party $P_i$ sends $(\bV^i_r, \pi^i_r)$ to every other party.\\
 \\
-After receiving $(\bV^i_r, \pi^i_r)$  from all other parties, $P_j$ checks,
-for each $i$, that the proof is valid, by sending $(\texttt{verify}, (\bV^i_r, \bX^i, \bY^i, \bK^i), \pi^i_r)$ to
+After receiving $(\bV^j_r, \pi^j_r)$  from all other parties, $P_i$ checks,
+for each $j$, that the proof is valid, by sending $(\texttt{verify}, (\bV^j_r, \bX^j, \bY^j, \bK^j), \pi^j_r)$ to
 $\mathcal{F}(\texttt{ZK}, \psi_r)$, and aborting if the functionality returns $0$.\\
-Each party $P_j$ then stores each $\bV^i_r$ as part of its output.
+Each party $P_i$ then stores each $\bV^j_r$ as part of its output.
 \end{aprotocol}
 
 \subsection{Security Analysis}
@@ -590,77 +590,77 @@ The simulator then proceeds as follows:\\
 $\calS$ starts by setting $(G, H)$ as the common reference string.
 
 \textbf{Round 0}:\\
-For each $j \in \calH$, $\calS$ samples $\bK^j \xleftarrow{R} \mathbb{G}$.\\
-For each $j \in \calM$,
-$\calS$ waits to receive $(\texttt{broadcast-in}, \texttt{sid}, \bK^j)$.\\
-$\calS$ then sends $(\texttt{broadcast-out}, \texttt{pid}_j, \texttt{sid}, \bK^j)$,
-to all parties, for every $j \in \calP$, emulating $\mathcal{C}$.
+For each $i \in \calH$, $\calS$ samples $\bK^i \xleftarrow{R} \mathbb{G}$.\\
+For each $i \in \calM$,
+$\calS$ waits to receive $(\texttt{broadcast-in}, \texttt{sid}, \bK^i)$.\\
+$\calS$ then sends $(\texttt{broadcast-out}, \texttt{pid}_i, \texttt{sid}, \bK^i)$,
+to all parties, for every $i \in \calP$, emulating $\mathcal{C}$.
 
 \textbf{Interim}:\\
-$\calS$ waits to receive $(\texttt{prove}, \texttt{sid}, (\bx^j, \by^j, \balpha^j, \bk^j, \bbeta^j))$
-for each malicious ${j \in \calM}$,
+$\calS$ waits to receive $(\texttt{prove}, \texttt{sid}, (\bx^i, \by^i, \balpha^i, \bk^i, \bbeta^i))$
+for each malicious ${i \in \calM}$,
 playing the role of $\mathcal{F}(\texttt{ZK}, \psi_1)$.\\
-$\calS$ checks, for each $j$, that:
+$\calS$ checks, for each $i$, that:
 $$
 \begin{aligned}
-\bX^j &\stackrel{?}{=} \bx^j \cdot G\\
-\bY^j &\stackrel{?}{=} \by^j \cdot G + \balpha^j \cdot H\\
-\bK^j &\stackrel{?}{=} \bk^j \cdot G + \bbeta^j \cdot H
+\bX^i &\stackrel{?}{=} \bx^i \cdot G\\
+\bY^i &\stackrel{?}{=} \by^i \cdot G + \balpha^i \cdot H\\
+\bK^i &\stackrel{?}{=} \bk^i \cdot G + \bbeta^i \cdot H
 \end{aligned}
 $$
-otherwise, $\calS$ sets $\texttt{bad-values}^j_1 \gets 1$.\\
-$\calS$ records the values $\bx^j, \by^j, \balpha^j, \bk^j, \balpha^j$, for $j \in \calM$.\\
+otherwise, $\calS$ sets $\texttt{bad-values}^i_1 \gets 1$.\\
+$\calS$ records the values $\bx^i, \by^i, \balpha^i, \bk^i, \balpha^i$, for $i \in \calM$.\\
 
 Now, in the real execution against $\mathcal{F}(\texttt{GRC})$,
 with real honest parties $P_i$, for
-each $j \in \calM$, the parties $\calS$ controls, $\calS$ sends
-$(\texttt{input}, \texttt{sid}, \bx^j, \by^j, \balpha^j, \bk^j)$ to $\mathcal{F}(\texttt{GRC})$.\\
+each $i \in \calM$, the parties $\calS$ controls, $\calS$ sends
+$(\texttt{input}, \texttt{sid}, \bx^i, \by^i, \balpha^i, \bk^i)$ to $\mathcal{F}(\texttt{GRC})$.\\
 $\calS$ receives $(\texttt{output}, \texttt{sid}, \bV^1_1, \ldots, \bV^n_d)$ in return,
 and records these values.
 
 \textbf{Round $r$}:\\
 For each round $r \in [d]$, $\calS$ proceeds as follows:\\
-$\calS$ generates a new $\pi^i_r$ for each $i \in \calH$, and sends
-$(\bV^i_r, \pi^i_r)$ to every malicious $P_j$, with $j \in \calM$.
+$\calS$ generates a new $\pi^j_r$ for each $j \in \calH$, and sends
+$(\bV^j_r, \pi^j_r)$ to every malicious $P_i$, with $i \in \calM$.
 
 Unless $r = 1$, $\calS$ waits to receive 
-$(\texttt{prove}, \texttt{sid}, \hat{\bx}^j, \hat{\by}^j, \hat{\balpha}^j, \hat{\bk}^j, \hat{\bbeta}^j)$
-from each malicious $P_j$, for $j \in \calM$, playing the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$.\\
-$\mathcal{S}$ then checks, for each $j$, that:
+$(\texttt{prove}, \texttt{sid}, \hat{\bx}^i, \hat{\by}^i, \hat{\balpha}^i, \hat{\bk}^i, \hat{\bbeta}^i)$
+from each malicious $P_i$, for $i \in \calM$, playing the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$.\\
+$\mathcal{S}$ then checks, for each $i$, that:
 $$
 \begin{aligned}
-\bX^j &\stackrel{?}{=} \hat{\bx}^j \cdot G\\
-\bY^j &\stackrel{?}{=} \hat{\by}^j \cdot G + \hat{\balpha}^j \cdot H\\
-\bK^j &\stackrel{?}{=} \hat{\bk}^j \cdot G + \hat{\bbeta}^j \cdot H
+\bX^i &\stackrel{?}{=} \hat{\bx}^i \cdot G\\
+\bY^i &\stackrel{?}{=} \hat{\by}^i \cdot G + \hat{\balpha}^i \cdot H\\
+\bK^i &\stackrel{?}{=} \hat{\bk}^i \cdot G + \hat{\bbeta}^i \cdot H
 \end{aligned}
 $$
-and sets $\texttt{bad-values}^j_r \gets 1$ otherwise.\\
-The first check implies that $\hat{\bx^j} = \bx^j$. If it holds that
-$\hat{\by}^j \neq \by^j$ or $\hat{\bk}^j \neq \bk^j$, then $\calS$ has
+and sets $\texttt{bad-values}^i_r \gets 1$ otherwise.\\
+The first check implies that $\hat{\bx^i} = \bx^i$. If it holds that
+$\hat{\by}^i \neq \by^i$ or $\hat{\bk}^i \neq \bk^i$, then $\calS$ has
 found a value $h$ such that $h \cdot G = H$, as shown in \todo{reference previous section},
 and $\calS$ aborts, returning $h$.
 
-(Including when $r = 1$) $\calS$ generates a new $\pi^j_r$, and returns $(\texttt{proof}, \pi^j_r)$,
+(Including when $r = 1$) $\calS$ generates a new $\pi^i_r$, and returns $(\texttt{proof}, \pi^i_r)$,
 playing the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$.
 
 Concurrently, $\calS$ plays the role of $\mathcal{F}(\texttt{ZK}, \psi_r)$,
-responding to $(\texttt{verify}, (\hat{\bV}^i_r, \hat{\bX}^i, \hat{\bY}^i, \hat{\bK}^i), \pi)$
-queries. $\calS$ checks that there exists some $j \in \mathcal{P}$ such that
-$\pi^j_r = \pi$. $\calS$ then returns:
+responding to $(\texttt{verify}, (\hat{\bV}^j_r, \hat{\bX}^j, \hat{\bY}^j, \hat{\bK}^j), \pi)$
+queries. $\calS$ checks that there exists some $i \in \mathcal{P}$ such that
+$\pi^i_r = \pi$. $\calS$ then returns:
 $$
-\hat{\bV}^i_r \stackrel{?}{=} \bV^i_r \land
-\hat{\bX}^i \stackrel{?}{=} \bX^i \land
-\hat{\bY}^i \stackrel{?}{=} \bY^i \land
-\hat{\bK}^i \stackrel{?}{=} \bK^i \land
-\texttt{bad-values}^j_r \neq 1
+\hat{\bV}^j_r \stackrel{?}{=} \bV^j_r \land
+\hat{\bX}^j \stackrel{?}{=} \bX^j \land
+\hat{\bY}^j \stackrel{?}{=} \bY^j \land
+\hat{\bK}^j \stackrel{?}{=} \bK^j \land
+\texttt{bad-values}^i_r \neq 1
 $$
 
-$\calS$ then waits to receive $(\hat{\bV}^j, \hat{\pi}^j_r)$ for
-every malicious party $P_j$, with ${j \in \mathcal{M}}$.\\
-$\calS$ then checks if the query $(\texttt{verify}, (\hat{\bV^j_r}, \bX^j, \bY^j, \bK^j), \hat{\pi}^j_r)$
+$\calS$ then waits to receive $(\hat{\bV}^i, \hat{\pi}^i_r)$ for
+every malicious party $P_i$, with ${i \in \mathcal{M}}$.\\
+$\calS$ then checks if the query $(\texttt{verify}, (\hat{\bV^i_r}, \bX^i, \bY^i, \bK^i), \hat{\pi}^i_r)$
 would yield $1$, according to the logic in the section above.
-(If $\hat{\pi}^j_r$ doesn't match anything, the check is considered to fail).
-If this check fails, then $\calS$ simulates every honest $P_i$ aborting, with $i \in \calH$,
+(If $\hat{\pi}^i_r$ doesn't match anything, the check is considered to fail).
+If this check fails, then $\calS$ simulates every honest $P_j$ aborting, with $j \in \calH$,
 to abort, as if they'd seen an invalid proof themselves.
 
 This concludes the simulation.
@@ -672,11 +672,11 @@ probability.
 
 We argue that if $\calS$ does not abort in this way, then the simulation
 is perfect. For the first round, because pedersen commitments
-are perfectly hiding, sampling a random $\bK^j$ has an identical
+are perfectly hiding, sampling a random $\bK^i$ has an identical
 distribution as an honest party generating a pedersen commitment.
 For the rest of the protocol, all of our checks are equivalent
 to those made by honest parties. This is because the
-$\bV^i_j$ values are necessarily computed correctly, and use
+$\bV^j_i$ values are necessarily computed correctly, and use
 the inputs provided by the parties the adversary $\mathcal{A}$ controls.
 
 Because our simulator $\calS$ is perfect, and doesn't
