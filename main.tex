@@ -486,7 +486,36 @@ signatures.
 
 \section{MPC Protocol for GRCs}
 
-\todo{Talk about the committed model, the various kinds of commitments, the at least one honest model}.
+In this section, we describe an MPC protocol for computing
+a GRC on linearly shared inputs, with associated commitments.
+We also analyze the security of this protocol, proving that it
+is secure against an arbitrary number of malicious parties,
+and under concurrent composition, in the UC framework.
+
+For inputs, one natural kind of commitment are Pedersen commitments.
+In many protocols, however, it's more natural to use plain commitments,
+where a scalar $x$ is committed to with the value $x \cdot G$.
+This matches most threshold Schnorr schemes,
+in which the secret $x$ is split into shares $x_i$, with the shares
+of the public key $X_i := x_i \cdot G$ being known for all parties.
+While we could subsume these commitments as a case of Pedersen commitments,
+with a blinding factor set to $0$, explicitly considering these
+plain commitments yields a more efficient protocol.
+
+We thus split our input vector into three sections: $\bx, \by, \bk$.
+Each of this is linearly split into shares.
+We have shares $\bx^1, \ldots, \bx^n$ for each party, such that $\bx = \sum_i \bx^i$,
+and similarly for $\by$ and $\bk$.
+The shares of $\bx$ have plain commitments $\bX^i = \bx_i \cdot G$
+for each party.
+The shares of $\by$ have Pedersen commitments $\bY^i = \by_i \cdot G + \balpha^i \cdot H$,
+with $\balpha^i$ a vector of blinding factors held by each party.
+Finally, $\bk$ is intended to be randomly generated for each execution
+of the protocol.
+Honest parties will generate their share $\bk^i$ by sampling a random
+vector.
+As long as at least one participant in the protocol is honest,
+then $\bk := \sum_i \bk^i$ will also be random.
 
 \subsection{Ideal Functionality}
 \label{sec:idealfunc}
