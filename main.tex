@@ -36,6 +36,9 @@ with generators $G$ and $H$. Let $\Fq$ denote the scalar field associated
 with this group, and let $\Zq$ denote the additive group of elements
 in this field. We also define $[n] := [1, \ldots, n]$.
 
+By $\shared{x}$ we denote a linear secret sharing of some group element
+$x$. This is a set $\{x_1, \ldots, x_n\}$ such that $\sum_i x_i = x$.
+
 We make heavy use of group homomorphisms throughout this paper.
 We let
 $$
@@ -251,7 +254,7 @@ be created and verified without interacting with other parties.
 
 In the previous section, we saw an efficient sigma protocol
 for these proofs, so instantiating this ideal functionality
-can by using transformations for arbitrary sigma protocols.
+can be done by using transformations for arbitrary sigma protocols.
 There exist several such transformations, but security
 in the UC framework is tricky.
 
@@ -357,10 +360,10 @@ This might be advantageous for long messages.
 If we look at the various functionalities we saw in the introduction,
 they all share quite a few commonalities. They first convert
 a threshold sharing of the input into a linear sharing of the input.
-These secret shared inputs can be added together, using $[x]$ and $[y]$
-to form $[x + y]$, or used to multiply a group element, forming
-$[xA]$. These operations can be done locally.
-A secret shared value $[x]$ can be reconstructed, to have each party learn $x$.
+These secret shared inputs can be added together, using $\shared{x}$ and $\shared{y}$
+to form $\shared{x + y}$, or used to multiply a group element, forming
+$\shared{x \cdot A}$. These operations can be done locally.
+A secret shared value $\shared{x}$ can be reconstructed, to have each party learn $x$.
 
 In essence, \emph{group reconstruction circuits} are a vast generalization
 of this kind of functionality. The core of the idea is that the operations
