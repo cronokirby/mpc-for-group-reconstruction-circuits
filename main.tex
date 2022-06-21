@@ -1105,6 +1105,43 @@ or proofs inside the protocol.
 
 \subsection{Threshold Interpretations}
 
+One limitation of our current semantics for GRCs is that we require
+the inputs to have a \emph{linear} secret sharing.
+It might be interesting to explore an alternative interpretation
+in which we work directly with inputs with a threshold secret sharing,
+throughout the entire protocol.
+
+For example, in our DKG protocol, we produce linear shares
+of the public key.
+Most DKG protocols would rather produce a threshold secret sharing
+instead.
+Instead of interpreting the random nodes in our GRC
+by having each party generate their own linear share, we could
+instead use a verifiable secret sharing (VSS) protocol,
+such as \cite{feldman_practical_1987}, and create a threshold
+secret sharing of this random value.
+Applying this to the DKG circuit, we would get a protocol
+directly usable for generating keys for threshold encryption
+or signing.
+
+This alternative interpretation could also be useful
+for signing or encryption as well, by yielding a more robust protocol.
+If we take Schnorr signatures as an example,
+our current protocol takes the approach of first having the quorum
+of signers derive a linear secret sharing of the secret.
+The disadvantage of this approach is that we can't tolerate
+any failures from the signers after that point,
+even if more than a threshold remain.
+In contrast, the protocol of Stinson et al.~\cite{stinson_provably_2001},
+can continue as long as at least a threshold of signers
+remains, tolerating failures.
+It does this by using threshold secret sharings for every value,
+which ensures that the parties will be able to reconstruct
+the final signature, provided at least threshold remains
+by the end of the execution.
+Using a threshold interpetation of GRCs would bring this
+kind of robustness to a variety of different functionalities.
+
 \section{Conclusion}
 
 \todo{Summarize stuff}
