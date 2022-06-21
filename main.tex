@@ -192,7 +192,7 @@ we use, which are all products of $\G$ or $\Zq$.
 
 \begin{claim}
     Protocol \ref{prot:phiproof} is a valid sigma protocol,
-    in the sense of~\cite{damgard_-protocols_2002}.
+    in the sense of~\cite{damgard_sigma-protocols_2002}.
 \end{claim}
 
 Completeness follows directly from the fact that $\varphi$ is a homomorphism.
@@ -255,12 +255,24 @@ can by using transformations for arbitrary sigma protocols.
 There exist several such transformations, but security
 in the UC framework is tricky.
 
-\subsubsection{Fischlin Transform}
+\subsubsection{UC Secure ZK Proofs of Knowledge}
+
+One method consists of using the Fischlin transform~\cite{fischlin_communication-efficient_2005}.
+What makes this transform theoretically useful is that it provides
+a \emph{straight-line} extractor, which can extract the witness
+without having to rewind the prover.
+This scheme is made non-interactive using a random oracle,
+and work has been done explicitly considering this scheme in the UC
+framework, using the global random oracle model \cite{lysyanskaya_universally_2022}.
+
+Another method consists of working in the common reference string
+model, and using public key encryption to provide a trapdoor
+for witness extraction \cite{krenn_framework_2011, kosba_cc_2015}.
 
 \subsubsection{Session Bound Fiat-Shamir}
 
 An alternative method involves the Fiat-Shamir \cite{fiat_how_2006} transform.
-Unfortunately, the security of this method is heuristic,
+Unfortunately, the UC security of this method is heuristic,
 although we conjecture that in practice it is secure, even
 under concurrent composition.
 
