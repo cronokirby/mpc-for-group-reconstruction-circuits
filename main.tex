@@ -281,8 +281,10 @@ additional information inside of the hash generating the challenge.
 In addition to all of the usual inputs, the hash should also
 include a unique session identifier $\texttt{sid}$, as well as a unique
 identifier for $\texttt{pid}$ for the party generating the proof.
-This session identifier should be unique for each execution of the protocol,
-and the party identifier should be unique among the parties
+This session identifier should be unique for each execution of the protocol.
+Note that if multiple proofs are needed, each of these is considered a separate protocol,
+and thus requires a distinct session id.
+The party identifier should be unique among the parties
 participating in the protocol.
 The party identifier could even be globally unique,
 among all parties,
