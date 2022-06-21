@@ -14,19 +14,115 @@
 
 \section{Introduction}
 
-\todo{Threshold Cryptography is important.}
+Using threshold Cryptography~\cite{desmedt_society_1988,desmedt_threshold_1990},
+a consortium of parties can split
+a secret amongst themselves, such that no individual knows that
+secret, and yet a sufficiently large quorum can come together
+to perform tasks using that secret, such as signing
+or decrypting a message.
 
-\todo{There have been protocols for Schnorr signatures, Threshold Encryption.}
+Particularly efficient protocols for threshold signing
+using Schnorr signatures~\cite{schnorr_efficient_1990},
+have been devised
+\cite{komlo_frost_2020, nick_musig2_2021, lindell_simple_2022}.
+Similarly, efficient protocols for threshold
+encryption can be constructed~\cite{desmedt_threshold_1990, shoup_securing_2001},
+based on ElGamal encryption \cite{elgamal_public_1985}.
 
-\todo{What makes these efficient is...}
+These protocols are efficient in large part due to the structure
+of the underlying schemes being lifted to threshold setting.
+In particular, these schemes have the interesting property
+that their computation is \emph{homomorphic} with respect
+to their secret inputs.
 
-\todo{In this work we generalize this functionalities by...}
+To illustrate this, consider the computation of a Schnorr signature:
+$$
+\begin{aligned}
+\textcolor{red}{k} &\xleftarrow{R} \mathbb{F}_q\\
+K &\gets \textcolor{red}{k} \cdot G\\
+e &\gets H(K, m)\\
+s &\gets \textcolor{red}{k} + H(K, m)\textcolor{red}{x}\\
+(K&, S)
+\end{aligned}
+$$
+Here, the secret values have been marked in red.
+Notice that each value we compute is linear with respect
+to the secrets it uses.
+For example, if we have $\textcolor{red}{k} = k_0 + k_1$,
+then we have $K = k_0 \cdot G + k_1 \cdot G$.
+Similarly, if we have $\textcolor{red}{x} = x_0 + x_1$, then
+we have $s = (k_0 + e x_0) + (k_1 + e x_1)$.
+This property leads to very efficient protocols when the
+secrets are shared linearly among the participants:
+each participant can locally compute their portion of the result,
+and then the participants reconstruct the output by revealing
+their portions, and adding them together.
+This computation needs to be done in stages, because the
+homomorphic property is sometimes broken.
+For example, the use of the hash function $H$ in this signature
+scheme requires the parties to reconstruct $K$ before proceeding
+with the rest of the computation.
 
-\todo{We do an MPC protocol with commitments, and have a proof...}
+This linear sharing of inputs is directly amenable to the threshold
+setting.
+This is because
+the most common method of threshold secret sharing,
+using polynomial interpolation~\cite{shamir1979share},
+allows for a quorum of parties to locally convert their shares
+into a linear sharing $x_1 + \ldots + x_n$ of the secret.
 
-\todo{The essence of our protocol is...}
+This homomorphic property is not unique to Schnorr signatures
+and ElGamal encryption.
+In fact, this property is present among a wide variety
+of functionalities, including distributed key generation,
+as well as polynomial commitments and openings~\cite{kate_constant-size_2010}.
 
-\todo{Organization of the rest of this paper...}
+In this work, we generalize these disparate functionalities,
+and unify them under the novel framework of
+\emph{group reconstruction circuits} (GRC).
+These can be seen as a special class of programs which precisely
+capture the property of staged homomorphic computation,
+which is what makes threshold Schnorr signatures and
+threshold ElGamal encryption so efficient.
+
+We then provide an efficient multiparty computation (MPC) protocol
+for computing GRCs on linearly secret shared inputs.
+In fact, our protocol provides MPC with \emph{commitment},
+in the sense that the protocol also verifies that the inputs
+used correspond to publicly known commitments.
+We prove that our protocol is secure under concurrent composition,
+even in the presence of malicious participants,
+using the UC framework \cite{canetti2001universally}.
+This proof is done in the hybrid model,
+using ideal functionalites for authenticated broadcast,
+and for turning sigma protocols into non-interactive zero knowledge
+proofs of knowledge.
+We also make use of a group $\mathbb{G}$ in which the discrete
+logarithm is presumed to be hard.
+
+The essence of the protocol is that computation
+is separated into several sequential rounds.
+In each round, the parties locally compute their share
+of the output for this round, which they then send
+to the other participants.
+The output is then reconstructed by adding all of these
+shares together.
+To prevent parties from cheating, we also require
+that they prove, in zero knowledge, that they correctly computed their output using inputs
+which match their public commitments.
+Because this computation is homomorphic,
+there exists an efficient sigma protocol for
+these proofs \cite{maurer_unifying_2009}.
+
+Finally, we provide examples of GRCs for distributed key generation,
+Schnorr signatures, ElGamal encryption, as well as polynomial commitments
+and openings, which then automatically yield corresponding
+protocols for threshold signatures, encryption, polynomial commitments,
+etc.
+The round complexity of our generic protocol is comparable
+to functionality specific protocols: we can do threshold
+Schnorr signatures in 3 rounds, matching Lindell's scheme \cite{lindell_simple_2022},
+and threshold ElGamal in a single round.
 
 \section{Background}
 \label{sec:background}
