@@ -191,7 +191,8 @@ In practice, we'll set $p = q$, which will work perfectly for the groups
 we use, which are all products of $\G$ or $\Zq$.
 
 \begin{claim}
-    Protocol \ref{prot:phiproof} is a valid sigma protocol.
+    Protocol \ref{prot:phiproof} is a valid sigma protocol,
+    in the sense of~\cite{damgard_-protocols_2002}.
 \end{claim}
 
 Completeness follows directly from the fact that $\varphi$ is a homomorphism.
@@ -344,7 +345,7 @@ For $\varphi$ nodes, the parties use the fact that
 $\shared{\varphi(x^1, \ldots, x^m)} = \varphi(\shared{x^1}, \ldots, \shared{x}^m)$,
 by locally computing their share of the result as $\varphi(x^1_i, \ldots, x^m_i)$.
 Finally, for output nodes, they use their local share of a value, if that
-value is secret, or the public value, if it has been reconstructed. \todo{phrasing?}
+value is secret, or the public value, if it has been reconstructed.
 
 As an example, let's consider the functionality for Schnorr signatures.
 
