@@ -1307,7 +1307,23 @@ kind of robustness to a variety of different functionalities.
 
 \section{Conclusion}
 
-\todo{Summarize stuff}
+In this work, we generalized various functionalities for
+signatures, encryption, and polynomial commitments,
+under the novel formalism of \emph{group reconstruction circuits} (GRC)s.
+
+We then constructed an efficient MPC protocol to compute these circuits
+on secret shared inputs, and proved it to be UC secure against
+malicious adversaries.
+
+This construction immediately yields UC secure protocols for threshold Schnorr
+signatures, ElGamal encryption, and polynomial commitments.
+
+While we've given a handful of examples of how GRCs can be used
+in this work, we hope that they might prove useful for other functionalities,
+given their generality.
+Hopefully, further work can improve on the simple protocol we've
+constructed in this work, further closing the gap between
+functionality-specific and generic protocols.
 
 \bibliographystyle{alpha}
 \small \bibliography{bib}
