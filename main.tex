@@ -902,6 +902,7 @@ instantiated on these circuits, with specialized
 protocols computing the same functionality.
 
 \subsection{Distributed Key Generation}
+\label{sec:dkg}
 
 Distributed Key Generation (DKG) can be formulated in terms of group
 reconstruction circuits.
@@ -927,6 +928,7 @@ of the circuit.
 
 
 \subsection{Threshold Schnorr Signatures}
+\label{sec:schnorr}
 
 We've described the Schnorr signature functionality as a GRC before,
 but not yet in normalized form. In this form, our input consists
@@ -1070,6 +1072,36 @@ We conjecture that improvements on these fronts might come from
 exploring other proof techniques.
 
 \subsection{Exploiting Circuit Structure}
+
+One advantage of the GRC formalism is that our protocol
+can be used to implement a large number of functionalities.
+A disadvantage is that the protocol is less efficient compared
+to protocols tailored to a specific functionality.
+Further work might be able to close this gap by exploiting
+specific patterns in circuits, while nonetheless
+remaining general.
+
+If we look at the DKG protocol of Section \ref{sec:dkg},
+we include a proof that we know $x_i$ and $\beta$ such that
+$x_i \cdot G = X_i$ and $x_i \cdot G + \beta \cdot H = K_i$.
+We do this via a $\varphi$-proof, but in this specific case,
+we could more efficiently prove this by simply revealing $\beta$.
+There's no need to hide $x_i \cdot G$ in this case, since the
+other parties learn this anyways.
+This pattern could be exploited more generally as well.
+
+As another example, if we look at the Schnorr signature
+protocol we end up with in Section \ref{sec:schnorr},
+we include a proof that the partial signature $s_i := k_i + H(K, m) \cdot x_i$
+was computed correctly.
+This proof is in fact redundant, because it suffices to verify
+the final signature computed by the protocol is valid.
+This is another repeatable pattern, wherein many functionalities
+are \emph{self-verifying}, to a certain extent,
+in the sense that the output already has some means of validation.
+Further work could try and more precisely quantify what
+this property means, and to what extent it can replace the use
+or proofs inside the protocol.
 
 \subsection{Threshold Interpretations}
 
