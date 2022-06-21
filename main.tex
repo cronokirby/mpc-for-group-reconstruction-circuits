@@ -901,9 +901,30 @@ We also compare the complexity of our generic protocol,
 instantiated on these circuits, with specialized
 protocols computing the same functionality.
 
-\todo{One example application for DKG, Schnorr, Threshold Encryption, Polynomial Commitments}
-
 \subsection{Distributed Key Generation}
+
+Distributed Key Generation (DKG) can be formulated in terms of group
+reconstruction circuits.
+This allows us to create a DKG protocol where the parties
+generate a common public key $X$, and where each party has
+a share $x_i$ of the private key, such that $\sum_i x_i \cdot G = x \cdot G = X$.
+
+We can formulate this as a GRC by having $x$ be considered a
+random input to the protocol. 
+Our circuit then consists of the single homomorphism:
+$$
+\varphi(x) := x \cdot G
+$$
+
+Concretely, the protocol works by having each party
+generate a random share $x_i$, and broadcasting a Pedersen commitment
+$K_i$.
+The parties then send $x_i \cdot G$, along with a proof that
+this value matches the commitment $K_i$ sent previously.
+The parties implicitly learn $x_i$ through this process,
+even though this output isn't explicitly considered in the description
+of the circuit.
+
 
 \subsection{Threshold Schnorr Signatures}
 
