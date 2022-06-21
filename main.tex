@@ -227,6 +227,9 @@ this work.
 
 \subsection{Ideal Functionalities for Sigma Protocols}
 
+The first ideal functionality we need is a functionality
+for $\varphi$-proofs.
+
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
 \\
@@ -237,9 +240,55 @@ $\mathcal{F}$ replies with $(\texttt{proof}, \pi)$.\\
 \\
 On input $(\texttt{verify}, X, \pi)$:\\
 $\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}{=} X)$.\\
-
-
 \end{afunctionality}
+
+This functionality allows a party to prove knowledge
+of a value $x$ such that $\varphi(x) = X$, while hiding
+this value $x$ from other parties.
+In particular, this functionality models the case
+of a \emph{non-interactive} proof, wherein a proof can
+be created and verified without interacting with other parties.
+
+In the previous section, we saw an efficient sigma protocol
+for these proofs, so instantiating this ideal functionality
+can by using transformations for arbitrary sigma protocols.
+There exist several such transformations, but security
+in the UC framework is tricky.
+
+\subsubsection{Fischlin Transform}
+
+\subsubsection{Session Bound Fiat-Shamir}
+
+An alternative method involves the Fiat-Shamir \cite{fiat_how_2006} transform.
+Unfortunately, the security of this method is heuristic,
+although we conjecture that in practice it is secure, even
+under concurrent composition.
+
+The idea is to do a standard Fiat-Shamir transform, including
+additional information inside of the hash generating the challenge.
+In addition to all of the usual inputs, the hash should also
+include a unique session identifier $\texttt{sid}$, as well as a unique
+identifier for $\texttt{pid}$ for the party generating the proof.
+This session identifier should be unique for each execution of the protocol,
+and the party identifier should be unique among the parties
+participating in the protocol.
+The party identifier could even be globally unique,
+among all parties,
+by using a public key, for example.
+
+Heuristically, these two values bind a proof to a particular execution
+and a particular party, thus preventing any reuse,
+which is a main practical concern when composing non-interactive
+proofs concurrently.
+
+Unfortunately, from a theoretical perspective, this protocol
+is not \emph{extractable}, without being able to rewind the adversary
+and program the random oracle.
+
+We include this protocol, although theoretically deficient,
+because its efficiency and simplicity might be attractive
+to implementations, and it would seem to satisfy practical
+notions of composable security.
 
 \subsection{Broadcast Functionalities}
 
