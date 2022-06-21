@@ -1045,11 +1045,32 @@ circuits.
 
 \section{Limitations and Further Work}
 
-\todo{Aggregating proofs}
+In this work, we presented the novel formalism
+of group reconstruction circuits, as well as a simple
+protocol for computing them on secret shared inputs in the
+malicious setting.
+We expect future work to expand upon this formalism,
+and improve upon the protocol we've provided.
+In this section, we go over a few potential improvement
+to our formalism and the protocol we've described.
 
-\todo{Exploiting circuit structure for lighter proofs}
+\subsection{Aggregating Proofs}
 
-\todo{Threshold Interpretations}
+Currently, our protocol requires verifying
+$(n - 1) \cdot d$ proofs: one for each layer, and each other party.
+A natural improvement would be to try aggregating these
+proofs, to reduce the cost of verifying them.
+This could be done by combining the proofs of different parties
+in a given round, or even combining proofs across different rounds.
+While $\varphi$-proofs have the advantage of being
+simple and efficient, they're not directly aggregatable, nor
+are they concise.
+We conjecture that improvements on these fronts might come from
+exploring other proof techniques.
+
+\subsection{Exploiting Circuit Structure}
+
+\subsection{Threshold Interpretations}
 
 \section{Conclusion}
 
