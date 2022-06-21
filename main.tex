@@ -944,7 +944,83 @@ which also have better concrete complexity.
 
 \subsection{Threshold Encryption}
 
-\subsection{Polynomial Commitments and Openings}
+We can create a threshold encryption scheme, by adapting
+ElGamal encryption \cite{elgamal_public_1985}.
+In this scheme, the ciphertext contains a group element $R \in \mathbb{G}$,
+and the value $x \cdot R$ needs to be computed, using the private key
+$x \in \Zq$. 
+
+This can naturally be described as a GRC, with a single input $x$,
+and a homomorphism:
+$$
+\varphi_1(x) := x \cdot R
+$$
+
+Using the same key generation assumptions as for Schnorr signatures,
+we get a threshold encryption scheme.
+A quorum decrypts a message by deriving linear shares $x = x_1 + \ldots + x_n$
+of the private key, along with commitments $X_i := x_i \cdot G$,
+and then use our protocol to learn the value $x \cdot R$,
+which allows each party to decrypt the message.
+Our protocol also guarantees that the output matches the public key $X$.
+
+The round complexity of our protocol is optimal, since we can skip
+the initial round, since there's no random input.
+Because of this, our protocol only takes a single round.
+
+\subsection{Polynomial Openings}
+
+The polynomial commitment scheme of Kate et al.~\cite{kate_constant-size_2010}
+provides an efficient scheme for committing to a polynomial
+$f \in \mathbb{F}_q[X]$, as well as for computing evaluation witnesses.
+These witness are short proofs that a value $f(z)$ corresponds
+to the evaluation of the committed polynomial $f$ at the point $z$.
+
+We can capture both the commitment and evaluation procedures
+using the formalism of group reconstruction circuits.
+This gives us a protocol for computing a commitment to a
+threshold-shared polynomial, as well as for evaluating that polynomial,
+and creating a witness for that evaluation.
+
+We recapitulate only the necessary details of these schemes,
+referring the reader to the full paper by Kate et al. for the remaining
+details.
+The commitment scheme assumes the existence of a trusted
+setup $G_0, \ldots, G_t \in \mathbb{G}$, satisfying a special relationship,
+and allowing commitments for polynomials of degree $t$.
+
+A commitment to a polynomial is computed as:
+$$
+\text{Com}(f) := \sum_i f_i \cdot G_i
+$$
+with $f_0, \ldots, f_t$ denoting the coefficients of that polynomial.
+
+An evaluation witness for $f$ at the point $z$ is computed by defining
+the polynomial:
+$$
+\psi_f(X) := \frac{f(X) - f(z)}{(X - z)}
+$$
+and then computing the witness as $\text{Com}(\psi_f)$.
+
+If we interpret polynomials $f \in \mathbb{F}_q[X]$ of degree $t$
+as vectors $\textbf{f} \in \Zq^{(t + 1)}$, 
+then we realize that both of these functionalities are already
+group reconstruction circuits.
+This is because $\text{Com}$ and $f \mapsto \psi_f$ are both
+homomorphisms with respect to the vector $\textbf{f}$.
+
+For $\text{Com}$ this is evident.
+On the other hand, for calculating $\psi_f$, it's not immediately
+clear that this is homomorphic.
+First, note that polynomial evaluation is homomorphic:
+$f(z) + g(z) = (f + g)(z)$.
+Thus, $f(X) - f(z)$ is also homomorphic with respect of $f$.
+Finally, note that division by a polynomial is also homomorphic.
+If $f(X) = q_f(X) p(x)$, and $g(X) = q_g(X) p(X)$, then $(f + g)(X) = (q_f + q_g)(X) p(X)$.
+
+Thus, both functionalities consist of a single homomorphism
+on the input vector, and are thus implementable as group reconstruction
+circuits.
 
 \section{Limitations and Further Work}
 
