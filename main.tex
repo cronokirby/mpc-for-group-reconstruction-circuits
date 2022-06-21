@@ -843,7 +843,7 @@ Some functionalities may not use any random input $\bk$.
 In this case, the first round can be omitted, since there's
 no need to commit to an empty vector.
 This actually improves the complexity of threshold encryption,
-as we'll see in Section \todo{cite}.
+as we'll see in Section \ref{sec:threshold_enc}.
 
 \subsubsection{Parallel Echos}
 
@@ -964,6 +964,7 @@ such as FROST \cite{komlo_frost_2020}, or MuSig2 \cite{nick_musig2_2021},
 which also have better concrete complexity.
 
 \subsection{Threshold Encryption}
+\label{sec:threshold_enc}
 
 We can create a threshold encryption scheme, by adapting
 ElGamal encryption \cite{elgamal_public_1985}.
