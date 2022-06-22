@@ -9,12 +9,13 @@
 \maketitle
 
 \begin{abstract}
-    In this work, we generalize threshold Schnorr signatures,
-    ElGamal encryption, and a wide variety of other functionalities,
-    under a novel formalism of \emph{group reconstruction circuits} (GRC)s.
+    \noindent In this work, we generalize threshold Schnorr signatures,
+    {ElGamal encryption}, and a wide variety of other functionalities,
+    using a novel formalism of \emph{group reconstruction circuits} (GRC)s.
     We construct a UC secure MPC protocol for computing these circuits
     on secret shared inputs, even in the presence of malicious parties.
-    Our protocol yields threshold signature and encryption schemes
+    Applied to concrete circuits,
+    our protocol yields threshold signature and encryption schemes
     with similar round complexity and concrete efficiency to
     functionality-specific protocols.
     Our formalism also generalizes to other functionalities,
@@ -26,21 +27,21 @@
 Using threshold Cryptography~\cite{desmedt_society_1988,desmedt_threshold_1990},
 a consortium of parties can split
 a secret amongst themselves, such that no individual knows that
-secret, and yet a sufficiently large quorum can come together
-to perform tasks using that secret, such as signing
+secret, and yet a sufficiently large quorum can
+perform tasks using that secret, such as signing
 or decrypting a message.
 
-Particularly efficient protocols for threshold signing
+Particularly efficient protocols for threshold signing,
 using Schnorr signatures~\cite{schnorr_efficient_1990},
 have been devised
 \cite{komlo_frost_2020, nick_musig2_2021, lindell_simple_2022}.
 Similarly, efficient protocols for threshold
 encryption can be constructed~\cite{desmedt_threshold_1990, shoup_securing_2001},
-based on ElGamal encryption \cite{elgamal_public_1985}.
+using ElGamal encryption \cite{elgamal_public_1985}.
 
-These protocols are efficient in large part due to the structure
-of the underlying schemes being lifted to threshold setting.
-In particular, these schemes have the interesting property
+These protocols are so efficient in large part due to the structure
+of the underlying schemes being lifted to the threshold setting.
+In particular, these schemes share the interesting property
 that their computation is \emph{homomorphic} with respect
 to their secret inputs.
 
@@ -50,25 +51,25 @@ $$
 \textcolor{red}{k} &\xleftarrow{R} \mathbb{F}_q\\
 K &\gets \textcolor{red}{k} \cdot G\\
 e &\gets H(K, m)\\
-s &\gets \textcolor{red}{k} + H(K, m)\textcolor{red}{x}\\
+s &\gets \textcolor{red}{k} + e \textcolor{red}{x}\\
 (K&, S)
 \end{aligned}
 $$
 Here, the secret values have been marked in red.
 Notice that each value we compute is linear with respect
 to the secrets it uses.
-For example, if we have $\textcolor{red}{k} = k_0 + k_1$,
+For example, if $\textcolor{red}{k} = k_0 + k_1$,
 then we have $K = k_0 \cdot G + k_1 \cdot G$.
-Similarly, if we have $\textcolor{red}{x} = x_0 + x_1$, then
+Similarly, if $\textcolor{red}{x} = x_0 + x_1$, then
 we have $s = (k_0 + e x_0) + (k_1 + e x_1)$.
 This property leads to very efficient protocols when the
-secrets are shared linearly among the participants:
-each participant can locally compute their portion of the result,
-and then the participants reconstruct the output by revealing
-their portions, and adding them together.
+secrets are shared linearly:
+each participant can individually compute their portion of the result,
+and then reconstruct the output together, by revealing
+their portions and adding them together.
 This computation needs to be done in stages, because the
 homomorphic property is sometimes broken.
-For example, the use of the hash function $H$ in this signature
+For example, the use of the hash function $H$ in this
 scheme requires the parties to reconstruct $K$ before proceeding
 with the rest of the computation.
 
@@ -90,18 +91,18 @@ In this work, we generalize these disparate functionalities,
 and unify them under the novel framework of
 \emph{group reconstruction circuits} (GRC).
 These can be seen as a special class of programs which precisely
-capture the property of staged homomorphic computation,
+capture this property of staged homomorphic computation,
 which is what makes threshold Schnorr signatures and
-threshold ElGamal encryption so efficient.
+ElGamal encryption so efficient.
 
 We then provide an efficient multiparty computation (MPC) protocol
-for computing GRCs on linearly secret shared inputs.
+for computing GRCs on linearly shared inputs.
 In fact, our protocol provides MPC with \emph{commitment},
 in the sense that the protocol also verifies that the inputs
 used correspond to publicly known commitments.
 We prove that our protocol is secure under concurrent composition,
 even in the presence of malicious participants,
-using the UC framework \cite{canetti2001universally}.
+within the UC framework \cite{canetti2001universally}.
 This proof is done in the hybrid model,
 using ideal functionalites for authenticated broadcast,
 and for turning sigma protocols into non-interactive zero knowledge
@@ -109,8 +110,9 @@ proofs of knowledge.
 We also make use of a group $\mathbb{G}$ in which the discrete
 logarithm is presumed to be hard.
 
-The essence of the protocol is that computation
-is separated into several sequential rounds.
+The essence of our protocol is quite simple.
+The computation
+is separated into a series rounds.
 In each round, the parties locally compute their share
 of the output for this round, which they then send
 to the other participants.
@@ -128,10 +130,10 @@ Schnorr signatures, ElGamal encryption, as well as polynomial commitments
 and openings, which then automatically yield corresponding
 protocols for threshold signatures, encryption, polynomial commitments,
 etc.
-The round complexity of our generic protocol is comparable
-to functionality specific protocols: we can do threshold
+The round complexity of these protocols are comparable
+to their functionality-specific equivalents: we can do threshold
 Schnorr signatures in 3 rounds, matching Lindell's scheme \cite{lindell_simple_2022},
-and threshold ElGamal in a single round.
+and threshold ElGamal in a single round, which is optimal.
 
 \section{Background}
 \label{sec:background}
@@ -141,7 +143,7 @@ with generators $G$ and $H$. Let $\Fq$ denote the scalar field associated
 with this group, and let $\Zq$ denote the additive group of elements
 in this field. We also define $[n] := [1, \ldots, n]$.
 
-By $\shared{x}$ we denote a linear secret sharing of some group element
+By $\shared{x}$, we denote a linear secret sharing of some group element
 $x$. This is a set $\{x_1, \ldots, x_n\}$ such that $\sum_i x_i = x$.
 
 We make heavy use of group homomorphisms throughout this paper.
@@ -166,24 +168,25 @@ as well as $\bx \cdot G$ for $(x_1 \cdot G, \ldots, x_n \cdot G)$.
 
 \subsection{Pedersen Commitments}
 
-A key component of our scheme are Pedersen commitments \cite{pedersen_non-interactive_1992}.
-In their basic form, they allow one to commit to a value in $x \in \Zq$. This
+Pedersen commitments \cite{pedersen_non-interactive_1992}
+are a key component of our protocol.
+In their basic form, they allow one to commit to a value $x \in \Zq$. This
 is done by sampling a random $\alpha \xleftarrow{R} \Zq$, and forming the commitment:
 $$
 \text{Com}(x, \alpha) := x \cdot G + \alpha \cdot H
 $$
 where $H$ is a generator of $\mathbb{G}$, independent from $G$.
 
-This scheme is \emph{perfectly hiding}, because $\alpha \cdot H$ acts like
-a random element of $\mathbb{G}$, and completely masks $x \cdot G$.
+This scheme is \emph{perfectly} hiding, because $\alpha \cdot H$ is
+a random element of $\mathbb{G}$, completely masking $x \cdot G$.
 
 On the other hand, this scheme is only \emph{computationally} binding. This
 is because the discrete logarithm $H$ with respect to $G$ must be kept hidden.
 If the discrete logarithm of $H$ is known, then it becomes possible to
-\emph{equivocate}, by finding two different inputs $(x, \alpha)$ and $(x', \alpha')$ with
-equal commitments, i.e. $\text{Com}(x, \alpha) = \text{Com}(x', \alpha')$.
+\emph{equivocate}, by finding two different inputs $(x, \alpha)$ and $(x', \alpha')$
+with the same commitment.
 
-In fact, we can more precisely characterize this property: knowing
+In fact, we can characterize this property more precisely: knowing
 the discrete logarithm of $H$ is \emph{necessary} in order to be able
 to equivocate.
 
@@ -212,7 +215,7 @@ $\blacksquare$
 It's useful to generalize this scheme to the case of a vector of scalars
 ${\textbf{x} \in \Zq^n}$. The randomness becomes a vector of the same
 size, sampled as ${\balpha \xleftarrow{R} \Zq^n}$. We then define
-an analogous commitment scheme by doing scalar multiplication element-wise:
+an analogous commitment scheme by using scalar multiplication element-wise:
 $$
 \text{Com}(\bx, \balpha) := \bx \cdot G + \balpha \cdot H
 $$
@@ -226,7 +229,7 @@ an analogous property with regards to equivocation:
     to efficiently compute the discrete logarithm of $H$.
 \end{claim}
 
-Since the two inputs are different, there must exist an index $i$
+Since the two inputs are different, there exists an index $i$
 such that $\bx_i \neq \bx_i'$ or $\balpha_i \neq \balpha_i'$.
 From here we apply Claim \ref{claim:ped_dlog} with $(\bx_i, \balpha_i)$ and
 $(\bx_i', \balpha'_i)$.
@@ -236,17 +239,18 @@ $\blacksquare$
 \subsubsection{On the Trusted Setup}
 
 In theory, Pedersen commitments require a trusted setup, to generate
-the group elements $G, H \in \mathbb{G}$. In practice, we argue that
-this trusted setup isn't a concern. This is the generator $G$
+the group elements $G, H \in \mathbb{G}$.
+We argue that this trusted setup isn't a concern in practice.
+This is because the generator $G$
 is usually part of the specification for the group being used,
 and because there exist
-efficient methods to hash into elliptic curves \cite{icart_how_2009}.
+efficient methods for hashing into elliptic curves \cite{icart_how_2009}.
 This reduces the problem of generating $H$ to that of finding a credibly
 ``unbiased'' choice of seed to hash. This can be done in many ways.
 
-One way would be to hash a canonical representation of $G$ as bytes in order
+One method would be to hash a canonical representation of $G$ as bytes in order
 to produce $H$. Presumably, the generator $G$ was not chosen in such
-a way as to produce an $H$ with a known discrete logarithm, with
+a way as to produce an $H$ with a known discrete logarithm using
 that specific method of hashing into the group.
 
 Another method would be to use a public source of randomness,
@@ -254,9 +258,9 @@ such as public newspapers, lotteries
 \cite{baigneres_trap_2015}, or Cryptographic protocols
 designed to provide such a service \cite{fischer_public_2011}.
 
-Now, in practice while we can avoid a trusted setup with these methods,
-for our security analysis we do actually make use of this setup.
-Essentially, we prove that the security of our protocol reduces
+Now, while we can avoid a trusted setup with these methods in practice,
+our security analysis does actually make use of this setup.
+Essentially, we'll prove that the security of our protocol reduces
 to the hardness of the discrete logarithm problem in $\mathbb{G}$,
 and to do this we need to be able to use an instance of the problem
 as a setup for the participants in our simulation.
@@ -735,7 +739,7 @@ can be derived by each party.
 The reason we allow the parties to also learn the individual shares
 being revealed is that our eventual protocol will also reveal this
 information, so we need to model the leakage in our functionality as well.
-Furthermore, this matches the semantics of group reconstruction circuits,
+Furthermore, this matches the semantics of GRCs,
 where parties learn the individual shares of the group element they're
 reconstructing.
 For practical functionalities like Schnorr signatures or threshold encryption,
@@ -1067,7 +1071,7 @@ a generic protocol.
 \label{sec:applications}
 
 In this section, we describe several applications of our protocol,
-by providing concrete group reconstruction circuits
+by providing concrete GRCs
 for various functionalities.
 We also compare the complexity of our generic protocol,
 instantiated on these circuits, with specialized
@@ -1173,7 +1177,7 @@ These witness are short proofs that a value $f(z)$ corresponds
 to the evaluation of the committed polynomial $f$ at the point $z$.
 
 We can capture both the commitment and evaluation procedures
-using the formalism of group reconstruction circuits.
+using the formalism of GRCs.
 This gives us a protocol for computing a commitment to a
 threshold-shared polynomial, as well as for evaluating that polynomial,
 and creating a witness for that evaluation.
@@ -1201,7 +1205,7 @@ and then computing the witness as $\text{Com}(\psi_f)$.
 If we interpret polynomials $f \in \mathbb{F}_q[X]$ of degree $t$
 as vectors $\textbf{f} \in \Zq^{(t + 1)}$, 
 then we realize that both of these functionalities are already
-group reconstruction circuits.
+GRCs.
 This is because $\text{Com}$ and $f \mapsto \psi_f$ are both
 homomorphisms with respect to the vector $\textbf{f}$.
 
@@ -1215,13 +1219,12 @@ Finally, note that division by a polynomial is also homomorphic.
 If $f(X) = q_f(X) p(x)$, and $g(X) = q_g(X) p(X)$, then $(f + g)(X) = (q_f + q_g)(X) p(X)$.
 
 Thus, both functionalities consist of a single homomorphism
-on the input vector, and are thus implementable as group reconstruction
-circuits.
+on the input vector, and are thus implementable as GRCs.
 
 \section{Limitations and Further Work}
 
 In this work, we presented the novel formalism
-of group reconstruction circuits, as well as a simple
+of group reconstruction circuits (GRC)s, as well as a simple
 protocol for computing them on secret shared inputs in the
 malicious setting.
 We expect future work to expand upon this formalism,
