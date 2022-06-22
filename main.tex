@@ -1243,6 +1243,31 @@ such that only the sum $\bV_r$ is revealed in each round.
 
 \subsection{Aggregating Commitments}
 
+Our current protocol commits to vectors of values by using
+independent commitments.
+An alternative would be to commit to the entire vector
+with a single commitment.
+We would do this by using independent generators $G_1, \ldots, G_m$,
+and then defining commitments like this:
+$$
+\text{Com}(\by, \alpha) := r\cdot H + \sum_i \by_i \cdot G_i
+$$
+This would have the advantage of a smaller communication cost,
+and a slightly improved computation cost, since we have single
+blinding factor $\alpha$, rather than an entire vector.
+
+A disadvantage of directly applying this change would be that if our homomorphisms are sparse,
+then our proofs wouldn't be able to take advantage of that, since
+the commitment now relies on the entire input vector, and so
+our proofs would need to use the entire input,
+even if the homomorphism for that round only needs a subset. 
+
+Further work might find a way to have the advantages of single
+element commitments, while also mitigating the overhead
+for sparse homomorphisms.
+while also mitigating the overhead
+for sparse homomorphisms.
+
 \subsection{Aggregating Proofs}
 
 Currently, our protocol requires verifying
