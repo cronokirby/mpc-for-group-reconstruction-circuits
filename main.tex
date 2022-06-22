@@ -95,7 +95,7 @@ capture this property of staged homomorphic computation,
 which is what makes threshold Schnorr signatures and
 ElGamal encryption so efficient.
 
-We then provide an efficient multiparty computation (MPC) protocol
+We then provide an efficient multi-party computation (MPC) protocol
 for computing GRCs on linearly shared inputs.
 In fact, our protocol provides MPC with \emph{commitment},
 in the sense that the protocol also verifies that the inputs
@@ -105,7 +105,7 @@ even in the presence of malicious participants,
 within the UC framework \cite{canetti2001universally}.
 This proof is done in the hybrid model,
 using ideal functionalites for authenticated broadcast,
-and for turning sigma protocols into non-interactive zero knowledge
+and for turning sigma protocols into non-interactive zero-knowledge
 proofs of knowledge.
 We also make use of a group $\mathbb{G}$ in which the discrete
 logarithm is presumed to be hard.
@@ -119,7 +119,7 @@ to the other participants.
 The output is then reconstructed by adding all of these
 shares together.
 To prevent parties from cheating, we also require
-that they prove, in zero knowledge, that they correctly computed their output using inputs
+that they prove, in zero-knowledge, that they correctly computed their output using inputs
 which match their public commitments.
 Because this computation is homomorphic,
 there exists an efficient sigma protocol for
@@ -276,7 +276,7 @@ We denote this protocol as a ``$\varphi$-proof'', and recapitulate the scheme
 here.
 
 Given a homomorphism $\varphi : \mathbb{A} \to \mathbb{B}$, and a public value
-$X \in \mathbb{B}$, the prover wants to demonstrate knowledge of a private
+$X \in \mathbb{B}$, a prover can demonstrate knowledge of a private
 value $x \in \mathbb{A}$ such that $\varphi(x) = X$. The prover
 does this by means of Protocol \ref{prot:phiproof}:
 
@@ -309,11 +309,11 @@ for which it suffices to set $p = q$.
 
 Completeness follows directly from the fact that $\varphi$ is a homomorphism.
 
-For the HVZK property, the simulator $\mathcal{S}(X, c)$ works by generating
+For the honest verifier zero-knowledge property, the simulator $\mathcal{S}(X, c)$ works by generating
 a random $s \xleftarrow{R} \mathbb{A}$, and then setting $K := \varphi(S) - c \cdot X$.
 
 Finally, we prove $2$-extractability. Given two verifying transcripts
-$(K, c, s)$ and $(K, c', s')$ sharing the first message, we extract
+$(K, c, s)$ and $(K, c', s')$, sharing the first message, we extract
 a value $\hat{x}$ satisfying $\varphi(\hat{x}) = X$ as follows:
 
 $$
@@ -340,7 +340,7 @@ this work.
 \subsection{Ideal Functionalities for Sigma Protocols}
 
 The first ideal functionality we need is a functionality
-for $\varphi$-proofs.
+for non-interactive $\varphi$-proofs.
 
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
 A functionality $\mathcal{F}$ for parties $P_1, \ldots, P_n$.\\
@@ -354,17 +354,17 @@ On input $(\texttt{verify}, X, \pi)$:\\
 $\mathcal{F}$ replies with $(\texttt{verify-result}, \varphi(x_\pi) \stackrel{?}{=} X)$.\\
 \end{afunctionality}
 
-This functionality allows a party to prove knowledge
+Functionality \ref{fun:zk} allows a party to prove knowledge
 of a value $x$ such that $\varphi(x) = X$, while hiding
 this value $x$ from other parties.
 In particular, this functionality models the case
 of a \emph{non-interactive} proof, wherein a proof can
 be created and verified without interacting with other parties.
 
-In the previous section, we saw an efficient sigma protocol
+In Section \ref{sec:maurer}, we saw an efficient sigma protocol
 for these proofs, so instantiating this ideal functionality
 can be done by using transformations for arbitrary sigma protocols.
-There exist several such transformations, but security
+There exist several such transformations, but having security
 in the UC framework is tricky.
 
 \subsubsection{UC Secure ZK Proofs of Knowledge}
@@ -380,12 +380,14 @@ framework, using the global random oracle model \cite{lysyanskaya_universally_20
 Another method consists of working in the common reference string
 model, and using public key encryption to provide a trapdoor
 for witness extraction \cite{krenn_framework_2011, kosba_cc_2015}.
+The simulator controls the trusted setup, knowing the private key,
+which can they can then use to extract witnesses from proofs.
 
 \subsubsection{Session Bound Fiat-Shamir}
 
 An alternative method involves the Fiat-Shamir \cite{fiat_how_2006} transform.
 Unfortunately, the UC security of this method is heuristic,
-although we conjecture that in practice it is secure, even
+although we conjecture that in practice it holds, even
 under concurrent composition.
 
 The idea is to do a standard Fiat-Shamir transform, including
@@ -395,7 +397,7 @@ include a unique session identifier $\texttt{sid}$, as well as a unique
 identifier for $\texttt{pid}$ for the party generating the proof.
 This session identifier should be unique for each execution of the protocol.
 Note that if multiple proofs are needed, each of these is considered a separate protocol,
-and thus requires a distinct session id.
+and thus requires a distinct session identifier.
 The party identifier should be unique among the parties
 participating in the protocol.
 The party identifier could even be globally unique,
@@ -403,8 +405,8 @@ among all parties,
 by using a public key, for example.
 
 Heuristically, these two values bind a proof to a particular execution
-and a particular party, thus preventing any reuse,
-which is a main practical concern when composing non-interactive
+and a particular party, thus preventing reusing proofs.
+This is the main practical concern when composing non-interactive
 proofs concurrently.
 
 Unfortunately, from a theoretical perspective, this protocol
@@ -420,8 +422,7 @@ notions of composable security.
 
 The second ideal functionality we need is a \emph{broadcast functionality}.
 The purpose of this functionality is to allow a party to send a message
-to all other parties, while guaranteeing that the party doesn't cheat
-by sending different messages.
+to all other parties, guaranteeing that they receive the same message.
 
 \begin{afunctionality}{fun:broadcast}{Authenticated Broadcast Functionality $\mathcal{C}$}
 A functionality $\mathcal{C}$ for parties $P_1, \ldots, P_n$.\\
@@ -432,14 +433,14 @@ $\mathcal{C}$ sends $(\texttt{broadcast-out}, \pid_i, \sid, m)$ to every party $
 \end{afunctionality}
 
 In fact, our functionality only needs to be usable a single time, so it's
-in reality a \emph{one-time} broadcast functionality, which might be simpler
+really a \emph{one-time} broadcast functionality, which might be simpler
 to implement.
 
 The key difference between this broadcast functionality and simply sending
 a message to all other parties is that the functionality prevents malicious
 participants from sending different messages to different parties.
-We use this later in the protocol to broadcast commitments, and in this
-situation it's important that all parties agree on what the values of
+We use this later in the protocol to broadcast commitments,
+because it's important that all parties agree on what the values of
 these commitments are.
 
 This functionality can be securely implemented
@@ -458,7 +459,7 @@ parties, $P_i$ checks that $\hat{m}_1^j = \hat{m}_2^j = \ldots = \hat{m}^j_n$,
 and then uses $\hat{m}^j_1$ as the message sent by $P_j$ for this session.
 \end{aprotocol}
 
-This protocol UC securely implements Functionality \ref{fun:broadcast}.
+Protocol \ref{prot:echo} UC securely implements Functionality \ref{fun:broadcast}.
 
 We note that instead of each party forwarding $\hat{m}^j$, it's also possible
 to send $H(\hat{m}^j)$, where $H$ is a collision-resistant hash function.
@@ -466,8 +467,8 @@ This might be advantageous for long messages.
 
 \section{Group Reconstruction Circuits}
 
-If we look at the various functionalities we saw in the introduction,
-they all share quite a few commonalities. They first convert
+The various functionalities mentioned in the introduction
+all share quite a few commonalities. They first convert
 a threshold sharing of the input into a linear sharing of the input.
 These secret shared inputs can be added together, using $\shared{x}$ and $\shared{y}$
 to form $\shared{x + y}$, or used to multiply a group element, forming
@@ -475,9 +476,9 @@ $\shared{x \cdot A}$. These operations can be done locally.
 A secret shared value $\shared{x}$ can be reconstructed, to have each party learn $x$.
 
 In essence, \emph{group reconstruction circuits} are a vast generalization
-of this kind of functionality. The core of the idea is that the operations
+of this kind of functionality. Our core observation is that the operations
 done inside of these functionalities are in fact all group homomorphisms,
-with respect to all of their inputs. Because of these, the functionality
+with respect to their inputs as a vector. Because of these, the functionality
 can be efficiently computed by each party locally, with the reconstruction
 steps done by having each party reveal their share of the secret.
 Furthermore, in the malicious setting, we can use $\varphi$-proofs in
@@ -488,9 +489,9 @@ order to efficiently demonstrate the correctness of our computations.
 Formally, a group reconstruction circuit (GRC) is a special kind of
 directed acyclic graph (DAG), similar to an arithmetic circuit.
 This graph is \emph{typed}, in the sense that each node is associated
-with some group $\mathbb{A}$, which represent the kinds of values
+with some group $\mathbb{A}$, designating the set of values
 that node is supposed to have.
-This graph features the following nodes:
+This graph is built with the following nodes:
 
 \begin{itemize}
     \item An input node, with type $\Zq$.
@@ -506,14 +507,15 @@ This graph features the following nodes:
 
 Each $\varphi$ node has a \emph{depth} associated with it, equal
 to the largest number of reconstruction nodes on a path from an input
+or random
 node to the $\varphi$ node, plus $1$.
-We can define the depth of a circuit, by taking the largest depth
+We can also associate a depth with the circuit, by taking the largest depth
 among its $\varphi$ nodes.
 
 This circuit can be given semantics in the form of a semi-honest MPC protocol.
 For each of the input nodes with value $x$, the parties have a linear
 secret sharing $\shared{x}$. For random nodes, the parties sample
-a sharing $\shared{k}$ by locally generating a random share $k_i \xleftarrow{R} \Zq$.
+a sharing $\shared{k}$ by locally sampling a random share $k_i \xleftarrow{R} \Zq$.
 For reconstruction nodes, the parties go from a secret sharing $\shared{y}$
 to a public value $y$ by having each party reveal their share $y_i$.
 For $\varphi$ nodes, the parties use the fact that
@@ -551,11 +553,9 @@ Figure \ref{fig:schnorr} presents the circuit for Schnorr signatures,
 with $\circlearrowleft$ denoting reconstruction nodes,
 $\$$ denoting random input nodes, and $\varphi$ denoting
 the parameterized homomorphism:
-
 $$
 \varphi(K)(x) := H(K, m) \cdot x
 $$
-
 Both the $\varphi$ and $+$ nodes have a depth of $2$, and thus so
 does the circuit.
 
@@ -583,8 +583,10 @@ This form is derived from a series of simple transformations on
 a GRC.
 
 First, note that the random input nodes of the GRC don't depend on
-any other node. Because of this, we can move all of these input nodes
-to the start of the circuit, which has the semantics of generating
+any other node.
+Because of this, we can move all of these nodes
+to the start of the circuit.
+This has the semantics of generating
 all the randomness in the circuit at the start of the execution.
 
 Second, instead of having several input nodes $x^1, \ldots, x^m$,
@@ -593,36 +595,36 @@ instead have a single input \emph{vector} $\bx \in \Zq^m$.
 This vector can also be considered as a single element of the product
 group, with addition defined pointwise, as in Section \ref{sec:background}.
 In fact, we can also include random elements as part of the input.
-The idea is that honest parties will generate this part of the input
+Honest parties will generate this part of the input
 randomly for each execution.
-We treat this issue in more detail in Section \ref{sec:idealfunc}.
+We treat this issue in more detail in Section \ref{sec:mpc_prot}.
 
 Third, we can make each $\varphi$ node depend on the entire
 input vector $\bx$.
-In practice, this dependency can be sparse, in that $\varphi$
-will only make use of a small number of elements in the input.
+In practice, this dependency can be sparse: $\varphi$
+may only make use of a small number of elements in the input.
 Nonetheless, $\varphi$ is still a homomorphism with respect
 to the entire input.
 This is because a projection $\pi : \Zq^m \to \Zq^l$, which selects
 a subset of elements from an input vector, is a group homomorphism.
 Any homomorphism using only a subset of elements can be composed with $\pi$
-to make a homomorphism taking in the entire vector.
+to make a homomorphism over the entire vector.
 
 Fourth, we can coalesce the homomorphisms together, creating one
 homomorphism for each ``layer'' of the circuit.
 We do this by first organizing the $\varphi$ nodes into layers,
 based on their depth.
 Each node with the same depth goes into the same layer.
-We then coalesce all of the homomorphisms in this layer into
+We then combine all of the homomorphisms in this layer into
 a single homomorphism $\varphi$.
 We can do this because the duplication map $a \mapsto (a, a)$
 and the projection map $(a, \_) \mapsto a$ are both homomorphisms.
-We can sort all of the homomorphisms topologically, and then compose
+We can sort all of the homomorphisms in a layer topologically, and then compose
 them sequentially, duplicating the input and projecting as necessary.
 
-We can also remove reconstruction nodes.
+Fifth, we can also remove reconstruction nodes.
 Because each layer only has a single homomorphism, we can consider
-the output of this homomorphism to neccessarily be reconstructed.
+the output of this homomorphism to necessarily be reconstructed.
 We then make each homomorphism parameterized by all of the reconstructed
 outputs from each previous layer.
 
@@ -630,10 +632,10 @@ Finally, we can remove output nodes.
 By considering the output of every layer to be part of the output,
 we include all of the output nodes connected to reconstruction nodes.
 For the other outputs, they can be locally computed using the reconstructed
-outputs, as well as the shares of the input vector, so it's not necessary
+outputs along with the shares of the input vector, so it's not necessary
 to include them in the circuit.
 
-Combining all of these gives us the formal description of normalized form
+Combining all of these transformations gives us the formal description of normalized form
 GRCs in Figure \ref{fig:grc}.
 
 \begin{afigure}{fig:grc}{GRCs in normalized form}
@@ -647,13 +649,13 @@ A group reconstruction circuit (GRC) in normalized form consists of:
 \end{itemize}
 \end{afigure}
 
-We can also give circuits in this form semantics, in the form
-of a semi-honest MPC protocol.
+We can also give circuits in this form semantics
+as a semi-honest MPC protocol.
 The parties have a linear secret sharing $\shared{\bx}$ of
 the input vector, some entries of which having been generated randomly
 for this execution.
-Then, for each layer $r \in 1, \ldots, d$, the parties locally
-compute $\bV_r^i := \varphi_r(\bV_1, \ldots, \bV_{r - 1})$,
+Then, for each layer $r \in [d]$, the parties locally
+compute ${}\bV_r^i := \varphi_r(\bV_1, \ldots, \bV_{r - 1})(\bx^i)$,
 and then reveal these shares, allowing each party to compute
 $\bV_r := \sum_i \bV_r^i$.
 The values $\bV_1, \ldots, \bV_d$ make up the output of the protocol.
@@ -663,10 +665,11 @@ in normalized form for several functionalities, including Schnorr
 signatures.
 
 \section{MPC Protocol for GRCs}
+\label{sec:mpc_prot}
 
 In this section, we describe an MPC protocol for computing
 a GRC on linearly shared inputs, with associated commitments.
-We also analyze the security of this protocol, proving that it
+We analyze the security of this protocol, proving that it
 is secure against an arbitrary number of malicious parties,
 and under concurrent composition, in the UC framework.
 
@@ -680,7 +683,7 @@ While we could subsume these commitments as a case of Pedersen commitments,
 with a blinding factor set to $0$, explicitly considering these
 plain commitments yields a more efficient protocol.
 
-We thus split our input vector into three sections: $\bx, \by, \bk$.
+We thus split our input vector into three sections: $\bx$, $\by$, and $\bk$.
 Each of this is linearly split into shares.
 We have shares $\bx^1, \ldots, \bx^n$ for each party, such that $\bx = \sum_i \bx^i$,
 and similarly for $\by$ and $\bk$.
@@ -737,7 +740,7 @@ every round $r$, each party learns $\bV^i_r$ for every party $i$.
 Naturally, we have $\bV_r = \sum_i \bV^i_r$, so this information
 can be derived by each party.
 The reason we allow the parties to also learn the individual shares
-being revealed is that our eventual protocol will also reveal this
+is that our protocol will also reveal this
 information, so we need to model the leakage in our functionality as well.
 Furthermore, this matches the semantics of GRCs,
 where parties learn the individual shares of the group element they're
@@ -752,7 +755,7 @@ In this section, we provide a protocol implementing Functionality
 
 The basic idea is that for each round $r$, the parties locally
 compute $\bV^i_r := \varphi_r(\bx^i, \by^i, \bk^i)$, and then
-send these values to other parties, along with a proof that
+send these values to the other parties, along with a proof that
 the value was computed correctly, and that the inputs used correspond
 to the public commitments.
 
@@ -772,14 +775,14 @@ $$
 := (\varphi_r(\bx, \by, \bk),\ \bx \cdot G,\ \by \cdot G + \balpha \cdot H,\
 \bk \cdot G + \bbeta \cdot H) 
 $$
-This homomorphism uses the same inputs to compute $\varphi_r$,
-but also reconstructs all of the commitments to the inputs.
-The $\varphi$-proofs seen in Section \ref{sec:maurer}
-provide an efficient sigma protocol to verify
+This homomorphism uses the same inputs to compute $\varphi_r$
+and reconstruct all of the commitments.
+We then combine this with the $\varphi$-proofs seen in Section \ref{sec:maurer} to
+create an efficient sigma protocol verifying
 that a value $\bV^i_r$ was computed using $\varphi_r$ on the correct
 inputs.
 We then use Functionality \ref{fun:zk} to turn these sigma protocols
-into ZK proof of knowledge functionalities.
+into non-interactive proof of knowledge functionalities.
 
 Protocol \ref{prot:mpc} describes all of this more formally.
 Like the ideal functionality, the protocol is parameterized by
@@ -830,7 +833,7 @@ Functionality \ref{fun:mpc} with UC security, even against an arbitrary
 number of malicious parties.
 More specifically, we work with the SUC model of security~\cite{canetti_simpler_2015}.
 We also work in the hybrid model, using Functionalities
-\ref{fun:zk} and \ref{fun:broadcast} for ZK proofs of knowledge,
+\ref{fun:zk} and \ref{fun:broadcast} for zero-knowledge proofs of knowledge,
 and authenticated broadcast, respectively.
 We also need a common reference string $(G, H) \in \mathbb{G}^2$, for
 Pedersen commitments.
@@ -839,15 +842,15 @@ In our proof, the simulator provides this string.
 \begin{claim}
 Provided that the discrete logarithm is hard in $\mathbb{G}$, Protocol \ref{prot:mpc} securely implements Functionality \ref{fun:mpc},
 in the hybrid model of universally composable security,
-given a zk functionality $\mathcal{F}(\text{ZK}, \varphi)$ (for arbitrary $\varphi$),
+given a non-interactive $\varphi$-proof functionality $\mathcal{F}(\text{ZK}, \varphi)$ (for arbitrary $\varphi$),
 a broadcast functionality $\mathcal{C}$, as well as a common reference string
 ${(G, H) \in \mathbb{G}^2}$.
 \end{claim}
 \textbf{Proof Idea:}\\
 The basic idea is that we use an instance of the discrete logarithm problem
 as our common reference string.
-This makes any break of the binding property of Pedersen commitments
-yield a solution to the discrete logarithm.
+This makes any violation of the binding property of Pedersen commitments
+yield a solution to this discrete logarithm instance.
 Otherwise, we can perfectly simulate an execution of the protocol
 using the ideal functionality, without rewinding
 the adversary, which lets us conclude that our protocol is UC secure,
@@ -856,8 +859,7 @@ using the result in \cite{kushilevitz_information-theoretically_2009}.
 One technical detail is that we need inputs from every party
 to give to the ideal functionality.
 Because of this, our simulator first runs the simulated protocol
-until the adversary provides the input for their parties in the first
-ZK proof.
+until the adversary provides the input for their parties in the first proof.
 We can then use these values for the parties the simulator controls
 in the ideal functionality.
 
@@ -874,7 +876,7 @@ simulate an execution of the hybrid protocol against an adversary
 $\mathcal{A}$.
 
 We also work in the common reference string model, where the simulator
-$\mathcal{S}$ chooses the bases $(G, H)$ for the Pedersen commitments.
+$\mathcal{S}$ chooses the generators $G, H$ for the Pedersen commitments.
 
 We use this simulator $\calS$ to construct an adversary against
 the discrete logarithm game.
@@ -936,7 +938,7 @@ $$
 \end{aligned}
 $$
 and sets $\texttt{bad-values}^i_r \gets 1$ otherwise.\\
-The first check implies that $\hat{\bx^i} = \bx^i$. If it holds that
+The first check implies that $\hat{\bx}^i = \bx^i$. If it holds that
 $\hat{\by}^i \neq \by^i$ or $\hat{\bk}^i \neq \bk^i$, then $\calS$ has
 found a value $h$ such that $h \cdot G = H$, as per Claim \ref{claim:ped_vec_dlog},
 and $\calS$ aborts, returning $h$.
@@ -1005,13 +1007,13 @@ be useful for concrete implementations of the protocol.
 
 \subsubsection{Sparse Proofs}
 
-For simplicity, we described each homomorphism $\varphi_i$ in the circuit
-as taking in the entire input vector $\bx$.
+For simplicity, we have each homomorphism $\varphi_i$ in the circuit
+take the entire input vector $\bx$.
 These homomorphisms may be \emph{sparse}, in the sense
 that they only use a few of the elements in the input vector.
 It should be noted that in this case, the $\varphi$-proofs can
 be done as if only these select elements existed, which gives
-a slightly smaller and faster proof.
+a smaller and faster proof.
 
 \subsubsection{Removing Random Commitments}
 
@@ -1029,16 +1031,16 @@ If we naively replace this functionality with the
 echo-broadcast in Protocol \ref{prot:echo},
 we increase the round complexity, since that protocol requires 2 rounds.
 However, the second round of the echo-broadcast protocol is only
-need to check the consistency of the broadcasted input; the parties
+needed to check the consistency of the broadcasted input; the parties
 already know the input after the first round.
-Because of this, we can run the re-broadcast round \emph{in parallel}
+Because of this, we can run this second round \emph{in parallel}
 with the rest of the protocol, and thus incur no additional
 cost to round complexity. 
 
 \subsubsection{Parallel $\texttt{sid}$}
 
-While there are different ways of instantiating the ZK proofs
-of knowledge for Functionality \ref{fun:zk}, some of them
+While there are different ways of instantiating
+the non-interactive proofs of knowledge Functionality \ref{fun:zk}, some of them
 heavily rely on the use of a unique session identifier $\texttt{sid}$.
 Because this particular identifier isn't needed in the first round,
 we can run a session identifier agreement protocol,
@@ -1061,9 +1063,9 @@ we need to include, as well as computing additional commitments
 for the random inputs.
 Thankfully, these proofs are quite efficient.
 The cost of each proof is dominated by that of computing
-$\varphi$, along with 5 scalar multiplications, to prove that
+$\varphi$ along with 1 or 2 scalar multiplications per input, to prove that
 the right inputs were used.
-While more expensive than more specialized protocols,
+While more expensive than specialized protocols,
 this is nonetheless a manageable amount of overhead for
 a generic protocol.
 
@@ -1122,7 +1124,7 @@ threshold signature scheme, assuming that some other distributed
 key generation scheme is used.
 Given a threshold sharing of the private key $x$,
 we assume that a quorum of parties can generate a linear sharing
-of $x$ as $x_1 + \ldots + x_n$, along with public key shares $X^i := x_i \cdot G$.
+of $x$ as $x_1 + \ldots + x_n$, along with public key shares $X_i := x_i \cdot G$.
 This assumption matches the standard polynomial schemes used
 for threshold secret sharing, where Lagrange interpolation is used
 to derive linear shares.
@@ -1131,7 +1133,7 @@ to compute a signature.
 
 The round complexity of this signing protocol matches
 that 3 round scheme of Lindell \cite{lindell_simple_2022}.
-The only additional security assumption we make is that hardness
+The only additional security assumption we make is the hardness
 of the discrete logarithm in $\mathbb{G}$, which makes our protocol
 relatively conservative, as Lindell's scheme purports to be.
 The concrete complexity of our protocol is a bit higher, because of
@@ -1160,13 +1162,12 @@ Using the same key generation assumptions as for Schnorr signatures,
 we get a threshold encryption scheme.
 A quorum decrypts a message by deriving linear shares $x = x_1 + \ldots + x_n$
 of the private key, along with commitments $X_i := x_i \cdot G$,
-and then use our protocol to learn the value $x \cdot R$,
+and then using our protocol to learn the value $x \cdot R$,
 which allows each party to decrypt the message.
 Our protocol also guarantees that the output matches the public key $X$.
 
-The round complexity of our protocol is optimal, since we can skip
-the initial round, since there's no random input.
-Because of this, our protocol only takes a single round.
+We can skip the initial round, since no random input is needed,
+making our protocol only take a single round, which is optimal.
 
 \subsection{Polynomial Openings}
 
@@ -1223,7 +1224,7 @@ on the input vector, and are thus implementable as GRCs.
 
 \section{Limitations and Further Work}
 
-In this work, we presented the novel formalism
+In this work, we presented the formalism
 of group reconstruction circuits (GRC)s, as well as a simple
 protocol for computing them on secret shared inputs in the
 malicious setting.
@@ -1251,24 +1252,23 @@ independent commitments.
 An alternative would be to commit to the entire vector
 with a single commitment.
 We would do this by using independent generators $G_1, \ldots, G_m$,
-and then defining commitments like this:
+and then defining commitments as the following sum:
 $$
 \text{Com}(\by, \alpha) := r\cdot H + \sum_i \by_i \cdot G_i
 $$
-This would have the advantage of a smaller communication cost,
-and a slightly improved computation cost, since we have single
+Using these commitments have the advantage of a smaller communication cost.
+The computation cost would be slightly improved as well, since we have single
 blinding factor $\alpha$, rather than an entire vector.
 
-A disadvantage of directly applying this change would be that if our homomorphisms are sparse,
-then our proofs wouldn't be able to take advantage of that, since
+Directly applying this change would be disadvantageous for sparse homomorphisms.
+Proofs would no longer be faster for such homomorphisms.
+This is because
 the commitment now relies on the entire input vector, and so
 our proofs would need to use the entire input,
-even if the homomorphism for that round only needs a subset. 
+even if the homomorphism for that round only used a small portion of that vector. 
 
 Further work might find a way to have the advantages of single
 element commitments, while also mitigating the overhead
-for sparse homomorphisms.
-while also mitigating the overhead
 for sparse homomorphisms.
 
 \subsection{Aggregating Proofs}
@@ -1315,14 +1315,14 @@ are \emph{self-verifying}, to a certain extent,
 in the sense that the output already has some means of validation.
 Further work could try and more precisely quantify what
 this property means, and to what extent it can replace the use
-or proofs inside the protocol.
+of proofs inside the protocol.
 
 \subsection{Threshold Interpretations}
 
 One limitation of our current semantics for GRCs is that we require
 the inputs to have a \emph{linear} secret sharing.
 It might be interesting to explore an alternative interpretation
-in which we work directly with inputs with a threshold secret sharing,
+in which we work directly with inputs using a threshold secret sharing,
 throughout the entire protocol.
 
 For example, in our DKG protocol, we produce linear shares
@@ -1339,26 +1339,28 @@ directly usable for generating keys for threshold encryption
 or signing.
 
 This alternative interpretation could also be useful
-for signing or encryption as well, by yielding a more robust protocol.
+for signing or encryption as well, in order to create a more robust protocol.
 If we take Schnorr signatures as an example,
 our current protocol takes the approach of first having the quorum
-of signers derive a linear secret sharing of the secret.
+of signers derive a linear secret sharing of the secret,
+and then having the entire quorum interact throughout the remainder
+of the protocol.
 The disadvantage of this approach is that we can't tolerate
-any failures from the signers after that point,
+any failures from the signers after the start of the protocol,
 even if more than a threshold remain.
 In contrast, the protocol of Stinson et al.~\cite{stinson_provably_2001},
 can continue as long as at least a threshold of signers
 remains, tolerating failures.
 It does this by using threshold secret sharings for every value,
 which ensures that the parties will be able to reconstruct
-the final signature, provided at least threshold remains
+the final signature, provided at least a threshold remains
 by the end of the execution.
 Using a threshold interpetation of GRCs would bring this
 kind of robustness to a variety of different functionalities.
 
 \section{Conclusion}
 
-In this work, we generalized various functionalities for
+In this work, we generalized various functionalities, including
 signatures, encryption, and polynomial commitments,
 under the novel formalism of \emph{group reconstruction circuits} (GRC)s.
 
