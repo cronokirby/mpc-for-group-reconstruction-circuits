@@ -2,7 +2,7 @@
 
 \date{\today}
 \title{MPC for Group Reconstruction Circuits}
-\author{Lúcás Críostóir Meier}
+\author{Lúcás Críostóir Meier\\\texttt{lucas@cronokirby.com}}
 
 \begin{document}
 
@@ -98,7 +98,7 @@ ElGamal encryption so efficient.
 We then provide an efficient multi-party computation (MPC) protocol
 for computing GRCs on linearly shared inputs.
 In fact, our protocol provides MPC with \emph{commitment},
-in the sense that the protocol also verifies that the inputs
+in the sense that it also verifies that the inputs
 used correspond to publicly known commitments.
 We prove that our protocol is secure under concurrent composition,
 even in the presence of malicious participants,
@@ -112,7 +112,7 @@ logarithm is presumed to be hard.
 
 The essence of our protocol is quite simple.
 The computation
-is separated into a series rounds.
+is separated into a series of rounds.
 In each round, the parties locally compute their share
 of the output for this round, which they then send
 to the other participants.
@@ -259,7 +259,7 @@ such as public newspapers, lotteries
 designed to provide such a service \cite{fischer_public_2011}.
 
 Now, while we can avoid a trusted setup with these methods in practice,
-our security analysis does actually make use of this setup.
+our security proof makes use of this setup.
 Essentially, we'll prove that the security of our protocol reduces
 to the hardness of the discrete logarithm problem in $\mathbb{G}$,
 and to do this we need to be able to use an instance of the problem
@@ -339,7 +339,7 @@ this work.
 
 \subsection{Ideal Functionalities for Sigma Protocols}
 
-The first ideal functionality we need is a functionality
+The first ideal functionality we need is 
 for non-interactive $\varphi$-proofs.
 
 \begin{afunctionality}{fun:zk}{Zero-Knowledge Functionality $\mathcal{F}(\texttt{ZK}, \varphi)$}
@@ -471,7 +471,7 @@ The various functionalities mentioned in the introduction
 all share quite a few commonalities. They first convert
 a threshold sharing of the input into a linear sharing of the input.
 These secret shared inputs can be added together, using $\shared{x}$ and $\shared{y}$
-to form $\shared{x + y}$, or used to multiply a group element, forming
+to form $\shared{x + y}$, or used to act on a group element, forming
 $\shared{x \cdot A}$. These operations can be done locally.
 A secret shared value $\shared{x}$ can be reconstructed, to have each party learn $x$.
 
@@ -582,7 +582,7 @@ as an MPC protocol.
 This form is derived from a series of simple transformations on
 a GRC.
 
-First, note that the random input nodes of the GRC don't depend on
+First, note that the random input nodes of the GRC do not depend on
 any other node.
 Because of this, we can move all of these nodes
 to the start of the circuit.
@@ -622,7 +622,7 @@ and the projection map $(a, \_) \mapsto a$ are both homomorphisms.
 We can sort all of the homomorphisms in a layer topologically, and then compose
 them sequentially, duplicating the input and projecting as necessary.
 
-Fifth, we can also remove reconstruction nodes.
+Fifth, we can remove reconstruction nodes.
 Because each layer only has a single homomorphism, we can consider
 the output of this homomorphism to necessarily be reconstructed.
 We then make each homomorphism parameterized by all of the reconstructed
@@ -970,7 +970,7 @@ This concludes the simulation.
 
 If $\calS$ aborts with a value $h$, then they've successfully
 solved an instance of the discrete logarithm problem. Under our
-assumption that this problem is hard, this happens with negligeable
+assumption that this problem is hard, this happens with negligible
 probability.
 
 We argue that if $\calS$ does not abort in this way, then the simulation
@@ -1230,7 +1230,7 @@ protocol for computing them on secret shared inputs in the
 malicious setting.
 We expect future work to expand upon this formalism,
 and improve upon the protocol we've provided.
-In this section, we go over a few potential improvement
+In this section, we suggest several potential improvements
 to our formalism and the protocol we've described.
 
 \subsection{Intermediate Values}
@@ -1257,7 +1257,7 @@ $$
 \text{Com}(\by, \alpha) := r\cdot H + \sum_i \by_i \cdot G_i
 $$
 Using these commitments have the advantage of a smaller communication cost.
-The computation cost would be slightly improved as well, since we have single
+The computation cost would be slightly improved as well, since we have a single
 blinding factor $\alpha$, rather than an entire vector.
 
 Directly applying this change would be disadvantageous for sparse homomorphisms.
@@ -1327,7 +1327,7 @@ throughout the entire protocol.
 
 For example, in our DKG protocol, we produce linear shares
 of the public key.
-Most DKG protocols would rather produce a threshold secret sharing
+Most applications would rather have a threshold secret sharing
 instead.
 Instead of interpreting the random nodes in our GRC
 by having each party generate their own linear share, we could
@@ -1355,7 +1355,7 @@ It does this by using threshold secret sharings for every value,
 which ensures that the parties will be able to reconstruct
 the final signature, provided at least a threshold remains
 by the end of the execution.
-Using a threshold interpetation of GRCs would bring this
+Using a threshold interpretation of GRCs would bring this
 kind of robustness to a variety of different functionalities.
 
 \section{Conclusion}
