@@ -1229,6 +1229,20 @@ and improve upon the protocol we've provided.
 In this section, we go over a few potential improvement
 to our formalism and the protocol we've described.
 
+\subsection{Intermediate Values}
+
+Functionality \ref{fun:mpc}, which our protocol implements,
+has the side effect of leaking the intermediate values
+$\bV^1_r, \ldots, \bV^n_r$ at each round,
+rather than just their sum $\bV_r := \sum_i \bV^i_r$.
+For functionalities like Schnorr signatures, this doesn't
+reveal information about the secrets,
+but this may not be the case in general.
+A potential improvement would be to design a protocol
+such that only the sum $\bV_r$ is revealed in each round.
+
+\subsection{Aggregating Commitments}
+
 \subsection{Aggregating Proofs}
 
 Currently, our protocol requires verifying
