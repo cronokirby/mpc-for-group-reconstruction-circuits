@@ -1,3 +1,2 @@
-# mpc-for-group-reconstruction-circuits
+# On Security Against Time Traveling Adversaries
 
-[https://eprint.iacr.org/2022/821](https://eprint.iacr.org/2022/821)
