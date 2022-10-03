@@ -1,8 +1,6 @@
 \include{preamble.tex}
 
-\date{\today}
 \title{MPC for Group Reconstruction Circuits}
-\author{Lúcás Críostóir Meier\\\texttt{lucas@cronokirby.com}}
 
 \begin{document}
 
@@ -34,9 +32,9 @@ or decrypting a message.
 Particularly efficient protocols for threshold signing,
 using Schnorr signatures~\cite{schnorr_efficient_1990},
 have been devised
-\cite{komlo_frost_2020, nick_musig2_2021, lindell_simple_2022}.
+\cite{komlo_frost_2020,nick_musig2_2021,lindell_simple_2022}.
 Similarly, efficient protocols for threshold
-encryption can be constructed~\cite{desmedt_threshold_1990, shoup_securing_2001},
+encryption can be constructed~\cite{desmedt_threshold_1990,shoup_securing_2001},
 using ElGamal encryption \cite{elgamal_public_1985}.
 
 These protocols are so efficient in large part due to the structure
@@ -190,11 +188,11 @@ In fact, we can characterize this property more precisely: knowing
 the discrete logarithm of $H$ is \emph{necessary} in order to be able
 to equivocate.
 
-\begin{claim}
-    \label{claim:ped_dlog}
+\begin{lemma}
+    \label{lemma:ped_dlog}
     Given two inputs $(x, \alpha) \neq (x', \alpha')$ such that ${\text{Com}(x, \alpha) = \text{Com}(x', \alpha')}$,
     it's possible to efficiently compute the discrete logarithm of $H$.
-\end{claim}
+\end{lemma}
 
 The proof is just a matter of algebra:
 
@@ -208,7 +206,7 @@ $$
 
 Thus $(x - x') / (\alpha' - \alpha)$ is our discrete logarithm.
 
-$\blacksquare$
+$\qed$
 
 \subsubsection{Vector Pedersen Commitments}
 
@@ -222,19 +220,19 @@ $$
 This generalization is naturally also perfectly hiding, and satisfies
 an analogous property with regards to equivocation:
 
-\begin{claim}
-    \label{claim:ped_vec_dlog}
+\begin{lemma}
+    \label{lemma:ped_vec_dlog}
     Given two inputs $(\bx, \balpha) \neq (\bx', \balpha')$ such that
     $\text{Com}(\bx, \balpha) = \text{Com}(\bx', \balpha')$, it's possible
     to efficiently compute the discrete logarithm of $H$.
-\end{claim}
+\end{lemma}
 
 Since the two inputs are different, there exists an index $i$
 such that $\bx_i \neq \bx_i'$ or $\balpha_i \neq \balpha_i'$.
-From here we apply Claim \ref{claim:ped_dlog} with $(\bx_i, \balpha_i)$ and
+From here we apply Lemma \ref{lemma:ped_dlog} with $(\bx_i, \balpha_i)$ and
 $(\bx_i', \balpha'_i)$.
 
-$\blacksquare$
+$\qed$
 
 \subsubsection{On the Trusted Setup}
 
@@ -302,10 +300,10 @@ Here, $p$ is chosen such that $\forall B \in \mathbb{B}.\ p \cdot B = 0$.
 In practice, many groups will be products of $\G$ or $\Zq$,
 for which it suffices to set $p = q$.
 
-\begin{claim}
+\begin{lemma}
     Protocol \ref{prot:phiproof} is a valid sigma protocol,
     in the sense of~\cite{damgard_sigma-protocols_2002}.
-\end{claim}
+\end{lemma}
 
 Completeness follows directly from the fact that $\varphi$ is a homomorphism.
 
@@ -330,7 +328,7 @@ a valid pre-image.
 
 We conclude that the protocol is a valid sigma protocol.
 
-$\blacksquare$
+$\qed$
 
 Maurer's protocol can also work even in the case where the order of
 the groups are not known, but this makes the challenge generation
@@ -379,7 +377,7 @@ framework, using the global random oracle model \cite{lysyanskaya_universally_20
 
 Another method consists of working in the common reference string
 model, and using public key encryption to provide a trapdoor
-for witness extraction \cite{krenn_framework_2011, kosba_cc_2015}.
+for witness extraction \cite{krenn_framework_2011,kosba_cc_2015}.
 The simulator controls the trusted setup, knowing the private key,
 which can they can then use to extract witnesses from proofs.
 
@@ -839,13 +837,13 @@ We also need a common reference string $(G, H) \in \mathbb{G}^2$, for
 Pedersen commitments.
 In our proof, the simulator provides this string.
 
-\begin{claim}
+\begin{theorem}
 Provided that the discrete logarithm is hard in $\mathbb{G}$, Protocol \ref{prot:mpc} securely implements Functionality \ref{fun:mpc},
 in the hybrid model of universally composable security,
 given a non-interactive $\varphi$-proof functionality $\mathcal{F}(\text{ZK}, \varphi)$ (for arbitrary $\varphi$),
 a broadcast functionality $\mathcal{C}$, as well as a common reference string
 ${(G, H) \in \mathbb{G}^2}$.
-\end{claim}
+\end{theorem}
 \textbf{Proof Idea:}\\
 The basic idea is that we use an instance of the discrete logarithm problem
 as our common reference string.
@@ -940,7 +938,7 @@ $$
 and sets $\texttt{bad-values}^i_r \gets 1$ otherwise.\\
 The first check implies that $\hat{\bx}^i = \bx^i$. If it holds that
 $\hat{\by}^i \neq \by^i$ or $\hat{\bk}^i \neq \bk^i$, then $\calS$ has
-found a value $h$ such that $h \cdot G = H$, as per Claim \ref{claim:ped_vec_dlog},
+found a value $h$ such that $h \cdot G = H$, as per Lemma \ref{lemma:ped_vec_dlog},
 and $\calS$ aborts, returning $h$.
 
 (Including when $r = 1$) $\calS$ generates a new $\pi^i_r$, and returns $(\texttt{proof}, \pi^i_r)$,
@@ -988,7 +986,7 @@ using~\cite{kushilevitz_information-theoretically_2009},
 that our protocol
 satisfies universally composable security, in the hybrid model.
 
-$\blacksquare$
+$\qed$
 
 \subsubsection{Identifiable Abort}
 
@@ -1378,6 +1376,6 @@ Hopefully, further work can improve on the simple protocol we've
 constructed in this work, further closing the gap between
 functionality-specific and generic protocols.
 
-\bibliographystyle{alpha}
-\small \bibliography{bib}
+\bibliographystyle{splncs04}
+\bibliography{bib}
 \end{document}
